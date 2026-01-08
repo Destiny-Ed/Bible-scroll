@@ -1,10 +1,18 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/theme_view_model.dart';
+import 'edit_profile_screen.dart';
+import 'settings_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isFollowing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +30,7 @@ class ProfileScreen extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.settings_outlined),
               onPressed: () {
-                // Navigate to settings
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
               },
             ),
             IconButton(
@@ -109,17 +117,41 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+                  ),
+                  child: const Text('Edit Profile'),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
-              ),
-              child: const Text('Edit Profile'),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isFollowing = !_isFollowing;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isFollowing ? Colors.grey : Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  ),
+                  child: Text(_isFollowing ? 'Unfollow' : 'Follow'),
+                ),
+              ],
             ),
           ],
         ),

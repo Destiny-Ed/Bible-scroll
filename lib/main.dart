@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/views/auth_screen.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/theme_view_model.dart';
 import 'viewmodels/feed_view_model.dart';
-import 'views/home_screen.dart';
 
 void main() {
   runApp(
@@ -94,7 +94,7 @@ class BibleScrollApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomeScreen(),
+      home: const AuthScreen(),
     );
   }
 }

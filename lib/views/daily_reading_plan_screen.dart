@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'create_reading_plan_screen.dart';
 
 class DailyReadingPlanScreen extends StatelessWidget {
   const DailyReadingPlanScreen({super.key});
@@ -26,9 +26,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        label: const Text('Start Today\'s Reading'),
-        icon: const Icon(Icons.play_arrow),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreateReadingPlanScreen()),
+          );
+        },
+        label: const Text('Create a Reading Plan'),
+        icon: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

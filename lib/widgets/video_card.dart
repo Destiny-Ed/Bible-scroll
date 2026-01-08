@@ -1,10 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:particles_flutter/shapes.dart';
 import 'package:video_player/video_player.dart';
 import 'package:particles_flutter/engine.dart';
 import '../models/video_model.dart';
+import '../views/video_player_screen.dart';
+import 'comments_modal_sheet.dart';
 
 class VideoCard extends StatefulWidget {
   final Video video;
@@ -38,19 +41,30 @@ class _VideoCardState extends State<VideoCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              )
-            : const Center(child: CircularProgressIndicator()),
-        _buildParticleEffect(),
-        _buildGradientOverlay(),
-        _buildVideoOverlay(),
-      ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                VideoPlayerScreen(videoUrl: widget.video.videoUrl),
+          ),
+        );
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _controller.value.isInitialized
+              ? AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                )
+              : const Center(child: CircularProgressIndicator()),
+          _buildParticleEffect(),
+          _buildGradientOverlay(),
+          _buildVideoOverlay(),
+        ],
+      ),
     );
   }
 
@@ -196,7 +210,18 @@ class _VideoCardState extends State<VideoCard> {
         const SizedBox(height: 20),
         _buildIconButton(Icons.share, ''),
         const SizedBox(height: 20),
-        _buildIconButton(Icons.comment, widget.video.comments.toString()),
+        GestureDetector(
+          onTap: () {
+            showMaterialModalBottomSheet(
+              context: context,
+              builder: (context) => const CommentsModalSheet(),
+            );
+          },
+          child: _buildIconButton(
+            Icons.comment,
+            widget.video.comments.toString(),
+          ),
+        ),
       ],
     );
   }
