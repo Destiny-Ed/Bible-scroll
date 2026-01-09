@@ -23,7 +23,7 @@ BibleScroll is a mobile application designed to provide users with a modern and 
 
 ### Screens
 
-- **Splash Screen:** Initial loading screen.
+- **Splash Screen:** A new, more engaging splash screen with the app's logo.
 - **Onboarding Screen:** Introduction to the app and its features.
 - **Home (Feed) Screen:** Main screen with a vertical feed of biblical content.
 - **Discover Screen:** A screen to discover new content and topics, including a list of books of the Bible.
@@ -39,12 +39,10 @@ BibleScroll is a mobile application designed to provide users with a modern and 
 
 ## Current Plan
 
-- **Objective:** Add a feature to browse books and chapters of the Bible.
+- **Objective:** Create a new, more engaging splash screen.
 - **Steps:**
-  1. Create a `Book` model.
-  2. Create a `BookListScreen` to display a list of all books.
-  3. Create a `ChapterListScreen` to display a list of chapters for a selected book.
-  4. Update the `ReadingDetailScreen` to fetch and display chapter content from an external API.
-  5. Add a button to the `DiscoverScreen` to navigate to the `BookListScreen`.
-  6. Update the `blueprint.md` file.
-  7. Verify the app by running `flutter pub get` and `flutter analyze`.
+  1. Create a new `SplashScreen` widget.
+  2. Add a logo to the assets and declare it in `pubspec.yaml`.
+  3. Set the `SplashScreen` as the initial route of the app.
+  4. Update the `blueprint.md` file.
+  5. Verify the app by running `flutter pub get` and `flutter analyze`.
