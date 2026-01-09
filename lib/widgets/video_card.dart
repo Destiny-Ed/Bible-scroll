@@ -6,6 +6,7 @@ import 'package:particles_flutter/shapes.dart';
 import 'package:video_player/video_player.dart';
 import 'package:particles_flutter/engine.dart';
 import '../models/video_model.dart';
+import '../views/chapter_detail_screen.dart';
 import '../views/video_player_screen.dart';
 import 'comments_modal_sheet.dart';
 
@@ -136,17 +137,28 @@ class _VideoCardState extends State<VideoCard> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.video.chapterTitle,
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: Colors.white,
-              shadows: [
-                const Shadow(
-                  blurRadius: 5,
-                  color: Colors.black45,
-                  offset: Offset(0, 2),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ChapterDetailScreen(chapterTitle: widget.video.chapterTitle),
                 ),
-              ],
+              );
+            },
+            child: Text(
+              widget.video.chapterTitle,
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                color: Colors.white,
+                shadows: [
+                  const Shadow(
+                    blurRadius: 5,
+                    color: Colors.black45,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
