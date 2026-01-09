@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/views/home_screen.dart';
+import 'package:myapp/viewmodels/feed_view_model.dart';
+import 'package:myapp/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/theme_view_model.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const BibleScrollApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => FeedViewModel()),
+      ],
+      child: BibleScrollApp(),
     ),
   );
 }
@@ -25,7 +29,7 @@ class BibleScrollApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       theme: _buildThemeData(Brightness.light),
       darkTheme: _buildThemeData(Brightness.dark),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -40,13 +44,14 @@ class BibleScrollApp extends StatelessWidget {
       brightness: brightness,
     );
 
-    final TextTheme textTheme = GoogleFonts.workSansTextTheme(
-      (isLight ? ThemeData.light() : ThemeData.dark()).textTheme,
-    ).copyWith(
-      titleLarge: const TextStyle(fontWeight: FontWeight.bold),
-      bodyMedium: const TextStyle(fontSize: 16),
-      labelSmall: TextStyle(color: Colors.grey.shade600),
-    );
+    final TextTheme textTheme =
+        GoogleFonts.workSansTextTheme(
+          (isLight ? ThemeData.light() : ThemeData.dark()).textTheme,
+        ).copyWith(
+          titleLarge: const TextStyle(fontWeight: FontWeight.bold),
+          bodyMedium: const TextStyle(fontSize: 16),
+          labelSmall: TextStyle(color: Colors.grey.shade600),
+        );
 
     return ThemeData(
       useMaterial3: true,
@@ -57,7 +62,9 @@ class BibleScrollApp extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurface,
+        ),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       cardTheme: CardThemeData(
@@ -65,7 +72,7 @@ class BibleScrollApp extends StatelessWidget {
         color: colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: colorScheme.outlineVariant, width: 0.5)
+          side: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -86,8 +93,8 @@ class BibleScrollApp extends StatelessWidget {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
-        elevation: 0,        
-      )
+        elevation: 0,
+      ),
     );
   }
 }

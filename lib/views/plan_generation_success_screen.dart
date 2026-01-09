@@ -12,12 +12,18 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Success',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -89,7 +95,11 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
             shape: BoxShape.circle,
             color: Theme.of(context).colorScheme.primary.withAlpha(26),
           ),
-          child: Icon(Icons.campaign, color: Theme.of(context).colorScheme.primary, size: 48),
+          child: Icon(
+            Icons.campaign,
+            color: Theme.of(context).colorScheme.primary,
+            size: 48,
+          ),
         ),
       ],
     );
@@ -169,7 +179,11 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildBenefitRow(context, Icons.check_circle, '30 Hand-picked verses'),
+                _buildBenefitRow(
+                  context,
+                  Icons.check_circle,
+                  '30 Hand-picked verses',
+                ),
                 const SizedBox(height: 12),
                 _buildBenefitRow(
                   context,
@@ -195,7 +209,13 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
         const SizedBox(width: 12),
-        Text(text, style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface)),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
       ],
     );
   }
@@ -225,7 +245,10 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onPrimary),
+          Icon(
+            Icons.arrow_forward,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ],
       ),
     );

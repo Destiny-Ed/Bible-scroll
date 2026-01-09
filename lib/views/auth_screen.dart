@@ -14,10 +14,7 @@ class AuthScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.black,
-              Colors.grey,
-            ],
+            colors: [Colors.black, Colors.grey],
           ),
         ),
         child: Column(
@@ -48,7 +45,9 @@ class AuthScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const GoalSelectionScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const GoalSelectionScreen(),
+                    ),
                   );
                 },
                 icon: const FaIcon(FontAwesomeIcons.google, color: Colors.red),

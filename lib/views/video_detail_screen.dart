@@ -6,9 +6,7 @@ class VideoDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Now Playing'),
-      ),
+      appBar: AppBar(title: const Text('Now Playing')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -21,7 +19,9 @@ class VideoDetailScreen extends StatelessWidget {
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(16),
                   image: const DecorationImage(
-                    image: NetworkImage('https://images.unsplash.com/photo-1593509497293-94637355156a?q=80&w=2070&auto=format&fit=crop'),
+                    image: NetworkImage(
+                      'https://images.unsplash.com/photo-1593509497293-94637355156a?q=80&w=2070&auto=format&fit=crop',
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -56,14 +56,11 @@ class VideoDetailScreen extends StatelessWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
+      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
     );
   }
 
-    Widget _buildUpNextList() {
+  Widget _buildUpNextList() {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -73,8 +70,8 @@ class VideoDetailScreen extends StatelessWidget {
         final titles = ['The Story of Moses', 'The Parables of Jesus'];
         final subtitles = ['An animated journey', 'Lessons for modern times'];
         final imageUrls = [
-          'https://images.unsplash.com/photo-1605047259183-72e951d72b27?q=80&w=2070&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1598493635232-f0449733d9d2?q=80&w=1974&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
         ];
 
         return Card(
@@ -105,7 +102,8 @@ class VideoDetailScreen extends StatelessWidget {
                       children: [
                         Text(
                           titles[index],
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -124,4 +122,3 @@ class VideoDetailScreen extends StatelessWidget {
     );
   }
 }
-

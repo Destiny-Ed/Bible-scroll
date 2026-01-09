@@ -46,7 +46,7 @@ class LibraryScreen extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                   ),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1516408529486-db3b24478794?q=80&w=1974&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
                     width: 120,
                     height: 90,
                     fit: BoxFit.cover,
@@ -60,7 +60,8 @@ class LibraryScreen extends StatelessWidget {
                       children: [
                         Text(
                           'The Story of David',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -87,11 +88,27 @@ class LibraryScreen extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            leading: Icon(Icons.bookmark, color: Theme.of(context).primaryColor),
-            title: Text('Genesis ${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            subtitle: const Text('A brief summary of the chapter...', style: TextStyle(color: Colors.grey)),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 20,
+            ),
+            leading: Icon(
+              Icons.bookmark,
+              color: Theme.of(context).primaryColor,
+            ),
+            title: Text(
+              'Genesis ${index + 1}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            subtitle: const Text(
+              'A brief summary of the chapter...',
+              style: TextStyle(color: Colors.grey),
+            ),
+            trailing: const Icon(
+              Icons.arrow_forward_ios,
+              size: 18,
+              color: Colors.grey,
+            ),
             onTap: () {
               // Navigate to chapter detail
             },

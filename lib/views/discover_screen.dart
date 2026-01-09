@@ -8,9 +8,7 @@ class DiscoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Discover'),
-      ),
+      appBar: AppBar(title: const Text('Discover')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -34,15 +32,15 @@ class DiscoverScreen extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const VideoDetailScreen()));
+            context,
+            MaterialPageRoute(builder: (context) => const VideoDetailScreen()),
+          );
         },
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
             Image.network(
-              'https://images.unsplash.com/photo-1593509497293-94637355156a?q=80&w=2070&auto=format&fit=crop',
+              'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
               height: 200,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -53,7 +51,7 @@ class DiscoverScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.black.withAlpha((255 * 0.7).round()),
-                    Colors.transparent
+                    Colors.transparent,
                   ],
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
@@ -64,10 +62,9 @@ class DiscoverScreen extends StatelessWidget {
                 children: [
                   Text(
                     'Finding Peace in Psalms',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(color: Colors.white),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(color: Colors.white),
                   ),
                   const SizedBox(height: 8),
                   const Text(
@@ -98,10 +95,7 @@ class DiscoverScreen extends StatelessWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
+      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
     );
   }
 
@@ -124,10 +118,9 @@ class DiscoverScreen extends StatelessWidget {
             child: Center(
               child: Text(
                 topics[index],
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontSize: 18),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontSize: 18),
               ),
             ),
           ),
@@ -147,9 +140,11 @@ class DiscoverScreen extends StatelessWidget {
           child: InkWell(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const VideoDetailScreen()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VideoDetailScreen(),
+                ),
+              );
             },
             child: Row(
               children: [
@@ -159,7 +154,7 @@ class DiscoverScreen extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                   ),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1516408529486-db3b24478794?q=80&w=1974&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
                     width: 120,
                     height: 90,
                     fit: BoxFit.cover,
@@ -173,9 +168,7 @@ class DiscoverScreen extends StatelessWidget {
                       children: [
                         Text(
                           'The Story of David',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
