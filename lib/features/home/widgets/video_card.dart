@@ -1,9 +1,11 @@
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:myapp/features/discover/models/video_model.dart';
 import 'package:myapp/features/discover/views/chapter_detail_screen.dart';
 import 'package:myapp/features/discover/widgets/comments_modal_sheet.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoCard extends StatefulWidget {
   final Video video;
@@ -15,42 +17,61 @@ class VideoCard extends StatefulWidget {
 }
 
 class _VideoCardState extends State<VideoCard> {
-  late VideoPlayerController _controller;
+  late final CachedVideoPlayerPlus _player;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.video.videoUrl))
-          ..initialize().then((_) {
-            setState(() {});
-            _controller.play();
-            _controller.setLooping(true);
-          });
+    _player = CachedVideoPlayerPlus.networkUrl(Uri.parse(widget.video.videoUrl))
+      ..initialize().then((_) {
+        setState(() => _isInitialized = true);
+        _player.controller.play();
+        _player.controller.setLooping(true);
+      });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _player.controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _controller.value.isInitialized
-              ? AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                )
-              : const Center(child: CircularProgressIndicator()),
-          _buildGradientOverlay(),
-          _buildVideoOverlay(),
-        ],
+    return VisibilityDetector(
+      key: Key(widget.video.id),
+      onVisibilityChanged: (info) {
+        if (!_isInitialized) return;
+        if (info.visibleFraction > 0.6) {
+          // Play if >60% visible
+          _player.controller.play();
+        } else {
+          _player.controller.pause();
+        }
+      },
+
+      child: GestureDetector(
+        onTap: () {
+          if (_player.controller.value.isPlaying) {
+            _player.controller.pause();
+          } else {
+            _player.controller.play();
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _player.controller.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _player.controller.value.aspectRatio,
+                    child: VideoPlayer(_player.controller),
+                  )
+                : const Center(child: CircularProgressIndicator.adaptive()),
+            _buildGradientOverlay(),
+            _buildVideoOverlay(),
+          ],
+        ),
       ),
     );
   }

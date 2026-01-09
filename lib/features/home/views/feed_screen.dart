@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/feed_view_model.dart';
 import '../widgets/video_card.dart';
@@ -36,9 +37,10 @@ class FeedScreen extends StatelessWidget {
         //   ),
         // ],
       ),
-      body: PageView.builder(
+      body: PreloadPageView.builder(
         scrollDirection: Axis.vertical,
         itemCount: feedViewModel.videos.length,
+        preloadPagesCount: 5,
         itemBuilder: (context, index) {
           return VideoCard(video: feedViewModel.videos[index]);
         },
