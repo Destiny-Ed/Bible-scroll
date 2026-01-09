@@ -72,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
           topRight: Radius.circular(30),
         ),
         child: BottomNavigationBar(
-          
           items: <BottomNavigationBarItem>[
             const BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
