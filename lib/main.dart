@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/views/splash_screen.dart';
+import 'package:myapp/views/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/theme_view_model.dart';
-import 'viewmodels/feed_view_model.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => FeedViewModel()),
-      ],
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
       child: const BibleScrollApp(),
     ),
   );
@@ -27,74 +23,71 @@ class BibleScrollApp extends StatelessWidget {
     return MaterialApp(
       title: 'BibleScroll',
       themeMode: themeProvider.themeMode,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        primaryColor: const Color(0xFF1E1E2C),
-        scaffoldBackgroundColor: const Color(0xFFF0F2F5),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF4A4A6A),
-          secondary: Color(0xFFF50057),
-          background: Color(0xFFF0F2F5),
-          surface: Colors.white,
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onBackground: Color(0xFF1E1E2C),
-          onSurface: Color(0xFF1E1E2C),
-        ),
-        textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme)
-            .copyWith(
-              displayLarge: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E1E2C),
-              ),
-              bodyMedium: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF4A4A6A),
-              ),
-            ),
-        cardTheme: CardThemeData(
-          elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+      theme: _buildThemeData(Brightness.light),
+      darkTheme: _buildThemeData(Brightness.dark),
+      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+
+  ThemeData _buildThemeData(Brightness brightness) {
+    final bool isLight = brightness == Brightness.light;
+
+    final Color seedColor = const Color(0xFF4A4A6A); // A nice deep purple
+
+    final ColorScheme colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor,
+      brightness: brightness,
+    );
+
+    final TextTheme textTheme = GoogleFonts.workSansTextTheme(
+      (isLight ? ThemeData.light() : ThemeData.dark()).textTheme,
+    ).copyWith(
+      titleLarge: const TextStyle(fontWeight: FontWeight.bold),
+      bodyMedium: const TextStyle(fontSize: 16),
+      labelSmall: TextStyle(color: Colors.grey.shade600),
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colorScheme.outlineVariant, width: 0.5)
         ),
       ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFF1E1E2C),
-        scaffoldBackgroundColor: const Color(0xFF121212),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF7B7B9E),
-          secondary: Color(0xFFF50057),
-          background: Color(0xFF121212),
-          surface: Color(0xFF1E1E2C),
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onBackground: Colors.white,
-          onSurface: Colors.white,
-        ),
-        textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme)
-            .copyWith(
-              displayLarge: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              bodyMedium: const TextStyle(fontSize: 16, color: Colors.white70),
-            ),
-        cardTheme: CardThemeData(
-          elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.3),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(30),
           ),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
         ),
       ),
-      home: const SplashScreen(),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurface.withAlpha(153),
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,        
+      )
     );
   }
 }

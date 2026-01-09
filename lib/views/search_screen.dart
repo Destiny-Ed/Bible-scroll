@@ -40,7 +40,7 @@ class SearchScreen extends StatelessWidget {
         hintText: 'Search for books or chapters...',
         prefixIcon: const Icon(Icons.search, color: Color(0xFF4A4A6A)),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.background,
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
           borderSide: BorderSide.none,
@@ -98,7 +98,7 @@ class SearchScreen extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
-                colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+                colors: [Colors.black.withAlpha(102), Colors.transparent],
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
               ),
@@ -131,7 +131,7 @@ class TopicChip extends StatelessWidget {
       padding: const EdgeInsets.only(right: 8.0),
       child: Chip(
         label: Text(label, style: const TextStyle(color: Color(0xFF4A4A6A))),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: Color(0xFF4A4A6A), width: 1),

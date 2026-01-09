@@ -6,9 +6,9 @@ class DailyReadingPlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF8F0),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('My Journey', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text('My Journey', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -33,11 +33,11 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -46,14 +46,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '30-DAY JOURNEY',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFFDB813)),
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             '30 Days of Peace: A Visual Journey',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 20),
           Row(
@@ -67,8 +67,8 @@ class DailyReadingPlanScreen extends StatelessWidget {
           const SizedBox(height: 20),
           LinearProgressIndicator(
             value: 0.4,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFDB813)),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
             minHeight: 10,
             borderRadius: BorderRadius.circular(5),
           ),
@@ -80,7 +80,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
   Widget _buildStatColumn(String value, String label) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
@@ -91,9 +91,9 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Today\'s Reading',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
         ),
         const SizedBox(height: 16),
         _buildReadingItem(context, 'Genesis 1-2', 'The Creation Story', true),
@@ -107,14 +107,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.05),
-      color: isCompleted ? const Color(0xFFF0F8FF) : Colors.white,
+      shadowColor: Colors.black.withAlpha(13),
+      color: isCompleted ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         leading: Icon(
           isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: isCompleted ? const Color(0xFFFDB813) : Colors.grey.shade400,
+          color: isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade400,
           size: 28,
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

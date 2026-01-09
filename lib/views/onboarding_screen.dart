@@ -53,16 +53,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.background,
-              Theme.of(context).colorScheme.surface,
-            ],
-          ),
-        ),
+         color: Theme.of(context).colorScheme.surface,
         child: Stack(
           children: [
              PageView.builder(
@@ -161,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -185,7 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(179),
             ),
             textAlign: TextAlign.center,
           ),
@@ -204,7 +195,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: _currentPage == index ? Theme.of(context).colorScheme.primary : Colors.grey.withOpacity(0.5),
+        color: _currentPage == index ? Theme.of(context).colorScheme.primary : Colors.grey.withAlpha(128),
       ),
     );
   }

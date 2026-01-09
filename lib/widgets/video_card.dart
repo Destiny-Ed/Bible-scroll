@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:particles_flutter/shapes.dart';
 import 'package:video_player/video_player.dart';
-import 'package:particles_flutter/engine.dart';
 import '../models/video_model.dart';
 import '../views/chapter_detail_screen.dart';
 import '../views/video_player_screen.dart';
@@ -61,7 +57,6 @@ class _VideoCardState extends State<VideoCard> {
                   child: VideoPlayer(_controller),
                 )
               : const Center(child: CircularProgressIndicator()),
-          // _buildParticleEffect(),
           _buildGradientOverlay(),
           _buildVideoOverlay(),
         ],
@@ -69,44 +64,14 @@ class _VideoCardState extends State<VideoCard> {
     );
   }
 
-  Widget _buildParticleEffect() {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-    return Particles(
-      particles: createParticles(), // List of particles
-      height: screenHeight,
-      width: screenWidth,
-    );
-  }
-
-  List<Particle> createParticles() {
-    var rng = Random();
-    List<Particle> particles = [];
-
-    // Circle particle example
-    for (int i = 0; i < 32; i++) {
-      particles.add(
-        CircularParticle(
-          color: Colors.white.withOpacity(0.6),
-          radius: rng.nextDouble() * 20,
-          velocity: Offset(
-            rng.nextDouble() * 200 * 20,
-            rng.nextDouble() * 200 * 20,
-          ),
-        ),
-      );
-    }
-    return particles;
-  }
-
   Widget _buildGradientOverlay() {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.black.withOpacity(0.3),
+            Colors.black.withAlpha(77),
             Colors.transparent,
-            Colors.black.withOpacity(0.5),
+            Colors.black.withAlpha(128),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -124,11 +89,9 @@ class _VideoCardState extends State<VideoCard> {
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Row(
-          spacing: 10,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             _buildTopSection(),
-            // const SizedBox(height: 16),
             _buildRightSection(),
           ],
         ),
@@ -178,37 +141,6 @@ class _VideoCardState extends State<VideoCard> {
       ),
     );
   }
-
-  // Widget _buildLeftSection() {
-  //   return Row(
-  //     children: [
-  //       const CircleAvatar(
-  //         radius: 24,
-  //         // backgroundImage: NetworkImage(widget.video.creator.profileImageUrl),
-  //       ),
-  //       const SizedBox(width: 12),
-  //       Text(
-  //         '@username', // Replace with actual username
-  //         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-  //           color: Colors.white,
-  //           fontWeight: FontWeight.bold,
-  //         ),
-  //       ),
-  //       const SizedBox(width: 8),
-  //       Container(
-  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  //         decoration: BoxDecoration(
-  //           color: Theme.of(context).colorScheme.secondary,
-  //           borderRadius: BorderRadius.circular(20),
-  //         ),
-  //         child: const Text(
-  //           'Follow',
-  //           style: TextStyle(color: Colors.white, fontSize: 12),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget _buildRightSection() {
     return Column(

@@ -19,9 +19,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToOnboarding() async {
     await Future.delayed(const Duration(seconds: 3), () {});
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-    );
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+      );
+    }
   }
 
   @override

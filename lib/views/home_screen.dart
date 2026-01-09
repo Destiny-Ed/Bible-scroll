@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'feed_screen.dart';
-import 'search_screen.dart';
-import 'daily_reading_plan_screen.dart';
-import 'bookmarks_screen.dart';
-import 'profile_screen.dart';
+import 'package:myapp/views/discover_screen.dart';
+import 'package:myapp/views/feed_screen.dart';
+import 'package:myapp/views/library_screen.dart';
+import 'package:myapp/views/daily_reading_plan_screen.dart';
+import 'package:myapp/views/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBody: true,
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
@@ -40,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         children: const [
           FeedScreen(),
-          SearchScreen(),
+          DiscoverScreen(),
           DailyReadingPlanScreen(),
-          BookmarksScreen(),
+          LibraryScreen(),
           ProfileScreen(),
         ],
       ),
@@ -51,73 +50,37 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          activeIcon: Icon(Icons.home),
+          label: 'Home',
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.explore_outlined),
+          activeIcon: Icon(Icons.explore),
+          label: 'Discover',
         ),
-        child: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home_filled),
-              label: 'Home',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.search_outlined),
-              activeIcon: Icon(Icons.search),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.add, color: Colors.white),
-              ),
-              label: 'Plan',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.bookmark_outline),
-              activeIcon: Icon(Icons.bookmark),
-              label: 'Bookmarks',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          type: BottomNavigationBarType.fixed,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(
-            context,
-          ).colorScheme.onSurface.withOpacity(0.6),
-          elevation: 0,
+        BottomNavigationBarItem(
+          icon: Icon(Icons.book_outlined),
+          activeIcon: Icon(Icons.book),
+          label: 'Plan',
         ),
-      ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bookmark_border),
+          activeIcon: Icon(Icons.bookmark),
+          label: 'Library',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          activeIcon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ],
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      type: BottomNavigationBarType.fixed,
     );
   }
 }
