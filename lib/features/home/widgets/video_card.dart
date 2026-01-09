@@ -139,14 +139,12 @@ class _VideoCardState extends State<VideoCard> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         _buildIconButton(Icons.favorite, widget.video.likes.toString()),
-        const SizedBox(height: 20),
-        _buildIconButton(Icons.bookmark, ''),
-        const SizedBox(height: 20),
-        _buildIconButton(Icons.share, ''),
+
         const SizedBox(height: 20),
         GestureDetector(
           onTap: () {
             showMaterialModalBottomSheet(
+              backgroundColor: Colors.transparent,
               context: context,
               builder: (context) => const CommentsModalSheet(),
             );
@@ -156,6 +154,12 @@ class _VideoCardState extends State<VideoCard> {
             widget.video.comments.toString(),
           ),
         ),
+        const SizedBox(height: 20),
+        _buildIconButton(Icons.bookmark, ''),
+        const SizedBox(height: 20),
+
+        _buildIconButton(Icons.share, ''),
+        const SizedBox(height: 20),
       ],
     );
   }

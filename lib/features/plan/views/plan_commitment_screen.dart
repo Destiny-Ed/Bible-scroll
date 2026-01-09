@@ -29,9 +29,7 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Step 2: Commitment'),
-      ),
+      appBar: AppBar(title: const Text('Step 2: Commitment')),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -56,19 +54,28 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
             Text(
               _commitmentInfo,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.grey),
+              style: const TextStyle(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+                color: Colors.grey,
+              ),
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PersonalizationQuestionnaireScreen()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const PersonalizationQuestionnaireScreen(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               child: const Text('Continue', style: TextStyle(fontSize: 18)),
             ),
@@ -82,9 +89,18 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
   Widget _buildTimeSlider() {
     return Column(
       children: [
-        const Text('How much time per day?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        const Text(
+          'How much time per day?',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 10),
-        Text('${_dailyTime.round()} minutes', style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary)),
+        Text(
+          '${_dailyTime.round()} minutes',
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
         Slider(
           value: _dailyTime,
           min: 5,
@@ -104,7 +120,10 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
   Widget _buildDurationChips() {
     return Column(
       children: [
-        const Text('Plan duration?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        const Text(
+          'Plan duration?',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 20),
         Wrap(
           spacing: 15,
@@ -128,7 +147,9 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
               ),
               selectedColor: Theme.of(context).colorScheme.primary,
               backgroundColor: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             );
           }).toList(),
         ),

@@ -10,7 +10,10 @@ class CommentsModalSheet extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       child: Column(
         children: [
-          const Text('Comments', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'Comments',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
@@ -21,7 +24,9 @@ class CommentsModalSheet extends StatelessWidget {
                     // backgroundImage: NetworkImage(comment.user.profileImageUrl),
                   ),
                   title: Text('username'), // Replace with actual username
-                  subtitle: Text('This is a comment'), // Replace with actual comment
+                  subtitle: Text(
+                    'This is a comment',
+                  ), // Replace with actual comment
                 );
               },
             ),
