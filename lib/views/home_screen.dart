@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'feed_screen.dart';
 import 'search_screen.dart';
@@ -31,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      // extendBody: true,
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
@@ -73,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           topRight: Radius.circular(30),
         ),
         child: BottomNavigationBar(
+          
           items: <BottomNavigationBarItem>[
             const BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
@@ -113,7 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
           showSelectedLabels: false,
           showUnselectedLabels: false,
           selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          unselectedItemColor: Theme.of(
+            context,
+          ).colorScheme.onSurface.withOpacity(0.6),
           elevation: 0,
         ),
       ),

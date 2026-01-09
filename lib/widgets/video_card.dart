@@ -61,7 +61,7 @@ class _VideoCardState extends State<VideoCard> {
                   child: VideoPlayer(_controller),
                 )
               : const Center(child: CircularProgressIndicator()),
-          _buildParticleEffect(),
+          // _buildParticleEffect(),
           _buildGradientOverlay(),
           _buildVideoOverlay(),
         ],
@@ -117,22 +117,27 @@ class _VideoCardState extends State<VideoCard> {
   }
 
   Widget _buildVideoOverlay() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _buildTopSection(),
-          const SizedBox(height: 16),
-          _buildBottomSection(),
-        ],
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          spacing: 10,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            _buildTopSection(),
+            // const SizedBox(height: 16),
+            _buildRightSection(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTopSection() {
-    return Align(
-      alignment: Alignment.bottomLeft,
+    return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,8 +147,9 @@ class _VideoCardState extends State<VideoCard> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      ChapterDetailScreen(chapterTitle: widget.video.chapterTitle),
+                  builder: (context) => ChapterDetailScreen(
+                    chapterTitle: widget.video.chapterTitle,
+                  ),
                 ),
               );
             },
@@ -173,44 +179,36 @@ class _VideoCardState extends State<VideoCard> {
     );
   }
 
-  Widget _buildBottomSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [_buildLeftSection(), _buildRightSection()],
-    );
-  }
-
-  Widget _buildLeftSection() {
-    return Row(
-      children: [
-        const CircleAvatar(
-          radius: 24,
-          // backgroundImage: NetworkImage(widget.video.creator.profileImageUrl),
-        ),
-        const SizedBox(width: 12),
-        Text(
-          '@username', // Replace with actual username
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Text(
-            'Follow',
-            style: TextStyle(color: Colors.white, fontSize: 12),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildLeftSection() {
+  //   return Row(
+  //     children: [
+  //       const CircleAvatar(
+  //         radius: 24,
+  //         // backgroundImage: NetworkImage(widget.video.creator.profileImageUrl),
+  //       ),
+  //       const SizedBox(width: 12),
+  //       Text(
+  //         '@username', // Replace with actual username
+  //         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+  //           color: Colors.white,
+  //           fontWeight: FontWeight.bold,
+  //         ),
+  //       ),
+  //       const SizedBox(width: 8),
+  //       Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  //         decoration: BoxDecoration(
+  //           color: Theme.of(context).colorScheme.secondary,
+  //           borderRadius: BorderRadius.circular(20),
+  //         ),
+  //         child: const Text(
+  //           'Follow',
+  //           style: TextStyle(color: Colors.white, fontSize: 12),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildRightSection() {
     return Column(
