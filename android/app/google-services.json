@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "907339903934",
+    "project_id": "biblescroll-93249",
+    "storage_bucket": "biblescroll-93249.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907339903934:android:bd33e862d55baed855bfef",
+        "android_client_info": {
+          "package_name": "app.biblescroll.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907339903934-fv6fstkcias859hhe6h93tmtj60pg0ei.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtIlqcsxGAh4Wsb3bqSHzn-sY9c8p8pc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "907339903934-fv6fstkcias859hhe6h93tmtj60pg0ei.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
