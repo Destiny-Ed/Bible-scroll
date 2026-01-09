@@ -1,19 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/home/widgets/video_card.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/feed_view_model.dart';
+import '../widgets/video_card.dart';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final feedViewModel = Provider.of<FeedViewModel>(context);
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Feed'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'For You',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // const SizedBox(width: 8),
+            // const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+          ],
+        ),
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.live_tv, color: Colors.white),
+        //     onPressed: () {},
+        //   ),
+        // ],
       ),
-      body: ListView.builder(
-        itemCount: 10,
+      body: PageView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: feedViewModel.videos.length,
         itemBuilder: (context, index) {
-          return const VideoCard(videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-a-girl-looking-at-the-camera-in-the-middle-of-a-beautiful-field-43402-large.mp4');
+          return VideoCard(video: feedViewModel.videos[index]);
         },
       ),
     );
