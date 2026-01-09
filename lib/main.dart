@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/viewmodels/feed_view_model.dart';
 import 'package:myapp/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'viewmodels/theme_view_model.dart';
@@ -28,7 +29,6 @@ class BibleScrollApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       theme: _buildThemeData(Brightness.light),
       darkTheme: _buildThemeData(Brightness.dark),
-      home: const SplashScreen(),
       home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
