@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/views/goal_selection_screen.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/theme_view_model.dart';
 import 'edit_profile_screen.dart';
@@ -152,6 +153,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Text(_isFollowing ? 'Unfollow' : 'Follow'),
                 ),
               ],
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const GoalSelectionScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
+              ),
+              child: const Text('Reading Plan'),
             ),
           ],
         ),
