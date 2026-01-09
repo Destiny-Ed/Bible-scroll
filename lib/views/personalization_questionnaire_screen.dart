@@ -9,7 +9,9 @@ class PersonalizationQuestionnaireScreen extends StatefulWidget {
 }
 
 class _PersonalizationQuestionnaireScreenState extends State<PersonalizationQuestionnaireScreen> {
-  final List<String> _topics = ['Parables', 'Wisdom', 'Prophecy', 'Miracles', 'History', 'Gospels'];
+  final List<String> _topics = [
+    'Parables', 'Wisdom', 'Prophecy', 'Miracles', 'History', 'Gospels', 'Psalms', 'Leadership', 'Love', 'Faith', 'Prayer'
+  ];
   final Set<String> _selectedTopics = {};
 
   @override
@@ -26,6 +28,12 @@ class _PersonalizationQuestionnaireScreenState extends State<PersonalizationQues
             const Text(
               'What interests you?',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Select the area that you interests you and that you will like to explore in your journey',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),

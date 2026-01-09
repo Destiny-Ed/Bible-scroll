@@ -12,6 +12,20 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
   double _dailyTime = 15;
   int _duration = 30;
 
+  String get _commitmentInfo {
+    String timeInfo;
+    if (_dailyTime <= 15) {
+      timeInfo = 'Light reading';
+    } else if (_dailyTime <= 30) {
+      timeInfo = 'Moderate pace';
+    } else {
+      timeInfo = 'Deep dive';
+    }
+
+    int totalDays = _duration;
+    return '$timeInfo. At this pace, you can develop a consistent habit in about $totalDays days.';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,10 +42,22 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 10),
+            const Text(
+              'Customize your spiritual journey to fit your daily schedule and long term goals',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 40),
             _buildTimeSlider(),
             const SizedBox(height: 40),
             _buildDurationChips(),
+            const SizedBox(height: 20),
+            Text(
+              _commitmentInfo,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Colors.grey),
+            ),
             const Spacer(),
             ElevatedButton(
               onPressed: () {
@@ -46,6 +72,7 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
               ),
               child: const Text('Continue', style: TextStyle(fontSize: 18)),
             ),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -83,9 +110,9 @@ class _PlanCommitmentScreenState extends State<PlanCommitmentScreen> {
           spacing: 15,
           runSpacing: 15,
           alignment: WrapAlignment.center,
-          children: [30, 60, 90, 180].map((days) {
+          children: [7, 30, 90, 180, 365].map((days) {
             return ChoiceChip(
-              label: Text('$days days'),
+              label: Text(days == 365 ? '1 year' : '$days days'),
               selected: _duration == days,
               onSelected: (selected) {
                 if (selected) {
