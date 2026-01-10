@@ -52,7 +52,6 @@ class _VideoCardState extends State<VideoCard> {
         } else {
           _player.controller.pause();
         }
-        _player.controller.pause();
       },
 
       child: GestureDetector(
