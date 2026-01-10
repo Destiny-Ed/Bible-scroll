@@ -106,7 +106,9 @@ class _VideoCardState extends State<VideoCard> with TickerProviderStateMixin {
                 builder: (context, child) {
                   return Icon(
                     Icons.favorite,
-                    color: Colors.red.withAlpha((255 * _animation.value).toInt()),
+                    color: Colors.red.withAlpha(
+                      (255 * _animation.value).toInt(),
+                    ),
                     size: 100 * _animation.value,
                   );
                 },
@@ -124,10 +126,7 @@ class _VideoCardState extends State<VideoCard> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.transparent,
-              Colors.black.withAlpha(178),
-            ],
+            colors: [Colors.transparent, Colors.black.withAlpha(178)],
           ),
         ),
         child: Padding(
@@ -136,13 +135,26 @@ class _VideoCardState extends State<VideoCard> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  CircleAvatar(backgroundImage: NetworkImage(widget.avatarUrl), radius: 16),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.avatarUrl),
+                    radius: 16,
+                  ),
                   const SizedBox(width: 8),
-                  Text(widget.uploader, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                  Text(
+                    widget.uploader,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
                 ],
               ),
             ],
@@ -159,7 +171,10 @@ class _VideoCardState extends State<VideoCard> with TickerProviderStateMixin {
       child: Column(
         children: [
           IconButton(
-            icon: Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: _isLiked ? Colors.red : Colors.white),
+            icon: Icon(
+              _isLiked ? Icons.favorite : Icons.favorite_border,
+              color: _isLiked ? Colors.red : Colors.white,
+            ),
             onPressed: _toggleLike,
           ),
           const Text('Like', style: TextStyle(color: Colors.white)),

@@ -23,12 +23,15 @@ class _VideoCardState extends State<VideoCard> {
   @override
   void initState() {
     super.initState();
-    _player = CachedVideoPlayerPlus.networkUrl(Uri.parse(widget.video.videoUrl))
-      ..initialize().then((_) {
-        setState(() => _isInitialized = true);
-        _player.controller.play();
-        _player.controller.setLooping(true);
-      });
+    _player = CachedVideoPlayerPlus.networkUrl(
+      Uri.parse(widget.video.videoUrl),
+    );
+
+    _player.initialize().then((_) {
+      setState(() => _isInitialized = true);
+      // _player.controller.play();
+      _player.controller.setLooping(true);
+    });
   }
 
   @override
@@ -42,13 +45,14 @@ class _VideoCardState extends State<VideoCard> {
     return VisibilityDetector(
       key: Key(widget.video.id),
       onVisibilityChanged: (info) {
-        if (!_isInitialized) return;
+        if (!_player.controller.value.isInitialized) return;
         if (info.visibleFraction > 0.6) {
           // Play if >60% visible
           _player.controller.play();
         } else {
           _player.controller.pause();
         }
+        _player.controller.pause();
       },
 
       child: GestureDetector(
@@ -62,7 +66,7 @@ class _VideoCardState extends State<VideoCard> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            _player.controller.value.isInitialized
+            _isInitialized
                 ? AspectRatio(
                     aspectRatio: _player.controller.value.aspectRatio,
                     child: VideoPlayer(_player.controller),

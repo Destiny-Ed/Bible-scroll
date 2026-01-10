@@ -2,66 +2,190 @@ import 'package:flutter/material.dart';
 import 'package:myapp/features/home/views/home_screen.dart';
 
 class PlanGenerationSuccessScreen extends StatelessWidget {
-  const PlanGenerationSuccessScreen({super.key});
+  final String goal;
+  final int dailyMinutes;
+  final int durationDays;
+  final List<String> topics;
+
+  const PlanGenerationSuccessScreen({
+    super.key,
+    required this.goal,
+    required this.dailyMinutes,
+    required this.durationDays,
+    required this.topics,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final onSurface = theme.colorScheme.onSurface;
+
+    final pace = dailyMinutes <= 15
+        ? 'Light'
+        : dailyMinutes <= 30
+            ? 'Moderate'
+            : 'Deep';
+
+    final durationText = durationDays == 365 ? '1 Year' : '$durationDays Days';
+    final topicsText = topics.isEmpty ? 'No specific topics selected' : topics.join(', ');
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: Icon(
-      //       Icons.arrow_back,
-      //       color: Theme.of(context).colorScheme.onSurface,
-      //     ),
-      //     onPressed: () => Navigator.of(context).pop(),
-      //   ),
-      //   title: Text(
-      //     'Success',
-      //     style: TextStyle(
-      //       color: Theme.of(context).colorScheme.onSurface,
-      //       fontWeight: FontWeight.bold,
-      //     ),
-      //   ),
-      //   centerTitle: true,
-      // ),
+      backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 20),
-                // _buildSuccessHeader(context),
+                const SizedBox(height: 40),
+
+                // Success Icon / Header
+                Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primary.withOpacity(0.15),
+                  ),
+                  child: Icon(
+                    Icons.celebration_rounded,
+                    size: 64,
+                    color: primary,
+                  ),
+                ),
+
                 const SizedBox(height: 32),
+
                 Text(
                   'Your Custom Plan is Ready!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: onSurface,
                   ),
                 ),
+
                 const SizedBox(height: 16),
-                const Text(
-                  'Based on your spiritual goals and daily habits, we\'ve crafted a journey just for you.',
+
+                Text(
+                  'We\'ve created a personalized journey based on your answers',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                 ),
-                const SizedBox(height: 32),
-                _buildPlanCard(context),
-                const SizedBox(height: 32),
-        
-                _buildStartButton(context),
-                const SizedBox(height: 16),
-                const Text(
-                  'You can adjust your goals anytime in settings.',
+
+                const SizedBox(height: 40),
+
+                // Personalized Summary Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Header banner
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: primary.withOpacity(0.12),
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                        ),
+                        child: Text(
+                          '$durationText Personalized Journey',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.all(28.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSummaryRow(
+                              context,
+                              icon: Icons.track_changes,
+                              label: 'Your Goal',
+                              value: goal,
+                            ),
+                            const Divider(height: 32),
+                            _buildSummaryRow(
+                              context,
+                              icon: Icons.timer_outlined,
+                              label: 'Daily Commitment',
+                              value: '$dailyMinutes minutes ($pace pace)',
+                            ),
+                            const Divider(height: 32),
+                            _buildSummaryRow(
+                              context,
+                              icon: Icons.calendar_today_outlined,
+                              label: 'Plan Duration',
+                              value: durationText,
+                            ),
+                            const Divider(height: 32),
+                            _buildSummaryRow(
+                              context,
+                              icon: Icons.category_outlined,
+                              label: 'Focus Topics',
+                              value: topicsText,
+                              isMultiLine: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Start Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    },
+                    icon: const Icon(Icons.play_arrow_rounded, size: 28),
+                    label: const Text(
+                      'Start My Journey Now',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Text(
+                  'You can adjust your plan anytime in Settings',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
+
                 const SizedBox(height: 40),
               ],
             ),
@@ -71,188 +195,46 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSuccessHeader(BuildContext context) {
-    return Column(
+  Widget _buildSummaryRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    bool isMultiLine = false,
+  }) {
+    return Row(
+      crossAxisAlignment: isMultiLine ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(4, (index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: 30,
-              height: 4,
-              decoration: BoxDecoration(
-                color: index == 3
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            );
-          }),
+        Icon(
+          icon,
+          size: 28,
+          color: Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary.withAlpha(26),
-          ),
-          child: Icon(
-            Icons.campaign,
-            color: Theme.of(context).colorScheme.primary,
-            size: 48,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlanCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(13),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.topLeft,
+        const SizedBox(width: 20),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-                child: Image.network(
-                  'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop', // Placeholder image
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withAlpha(230),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  'RECOMMENDED',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '30-DAY JOURNEY',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '30 Days of Peace: A Visual Journey',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildBenefitRow(
-                  context,
-                  Icons.check_circle,
-                  '30 Hand-picked verses',
-                ),
-                const SizedBox(height: 12),
-                _buildBenefitRow(
-                  context,
-                  Icons.check_circle,
-                  'Daily meditative visuals',
-                ),
-                const SizedBox(height: 12),
-                _buildBenefitRow(
-                  context,
-                  Icons.check_circle,
-                  'Personal reflection prompts',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBenefitRow(BuildContext context, IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
         ),
       ],
-    );
-  }
-
-  Widget _buildStartButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (Route<dynamic> route) => false,
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Start My Journey',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.arrow_forward,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ],
-      ),
     );
   }
 }

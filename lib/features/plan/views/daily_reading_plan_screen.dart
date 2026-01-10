@@ -8,7 +8,13 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text('My Journey', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        title: Text(
+          'My Journey',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -48,12 +54,20 @@ class DailyReadingPlanScreen extends StatelessWidget {
         children: [
           Text(
             '30-DAY JOURNEY',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             '30 Days of Peace: A Visual Journey',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 20),
           Row(
@@ -67,8 +81,12 @@ class DailyReadingPlanScreen extends StatelessWidget {
           const SizedBox(height: 20),
           LinearProgressIndicator(
             value: 0.4,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surfaceContainerHighest,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Theme.of(context).colorScheme.primary,
+            ),
             minHeight: 10,
             borderRadius: BorderRadius.circular(5),
           ),
@@ -80,7 +98,10 @@ class DailyReadingPlanScreen extends StatelessWidget {
   Widget _buildStatColumn(String value, String label) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
@@ -93,7 +114,11 @@ class DailyReadingPlanScreen extends StatelessWidget {
       children: [
         Text(
           'Today\'s Reading',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 16),
         _buildReadingItem(context, 'Genesis 1-2', 'The Creation Story', true),
@@ -103,23 +128,42 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReadingItem(BuildContext context, String title, String subtitle, bool isCompleted) {
+  Widget _buildReadingItem(
+    BuildContext context,
+    String title,
+    String subtitle,
+    bool isCompleted,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shadowColor: Colors.black.withAlpha(13),
-      color: isCompleted ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surface,
+      color: isCompleted
+          ? Theme.of(context).colorScheme.primaryContainer
+          : Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: 20,
+        ),
         leading: Icon(
           isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade400,
+          color: isCompleted
+              ? Theme.of(context).colorScheme.primary
+              : Colors.grey.shade400,
           size: 28,
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 18,
+          color: Colors.grey,
+        ),
         onTap: () {
           // Navigate to chapter detail
         },

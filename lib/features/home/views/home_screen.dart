@@ -14,30 +14,36 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final PageController _pageController = PageController();
+  // final PageController _pageController = PageController();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      // _pageController.animateToPage(
+      //   index,
+      //   duration: const Duration(milliseconds: 300),
+      //   curve: Curves.easeInOut,
+      // );
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        physics: NeverScrollableScrollPhysics(),
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      // body: PageView(
+
+      //   physics: NeverScrollableScrollPhysics(),
+      //   controller: _pageController,
+      //   onPageChanged: (index) {
+      //     setState(() {
+      //       _selectedIndex = index;
+      //     });
+      //   },
+      //   children: ,
+      // ),
+      body: IndexedStack(
+        key: ValueKey(_selectedIndex),
+        index: _selectedIndex,
         children: [
           FeedScreen(),
           DiscoverScreen(),

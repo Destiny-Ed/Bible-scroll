@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/features/onboarding/views/goal_selection_screen.dart';
+import 'package:myapp/features/onboarding/views/reading_plan_onboarding_screen.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
@@ -46,7 +46,7 @@ class AuthScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const GoalSelectionScreen(),
+                      builder: (context) => const ReadingPlanOnboardingScreen(),
                     ),
                   );
                 },

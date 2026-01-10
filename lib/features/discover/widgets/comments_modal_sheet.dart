@@ -95,6 +95,7 @@ class CommentsModalSheet extends StatelessWidget {
                 ),
               ),
               _buildCommentInputField(context),
+              const SizedBox(height: 20),
             ],
           ),
         );
