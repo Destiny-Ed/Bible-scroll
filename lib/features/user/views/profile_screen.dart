@@ -17,7 +17,10 @@ class ProfileScreen extends StatelessWidget {
     }
 
     // Fetch user profile
-    final profileViewModel = Provider.of<ProfileViewModel>(context, listen: false);
+    final profileViewModel = Provider.of<ProfileViewModel>(
+      context,
+      listen: false,
+    );
     profileViewModel.getUserProfile(user.uid);
 
     return Scaffold(
@@ -27,7 +30,10 @@ class ProfileScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
             },
           ),
         ],
@@ -56,18 +62,29 @@ class ProfileScreen extends StatelessWidget {
         children: [
           const CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Placeholder
+            backgroundImage: NetworkImage(
+              'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
+            ), // Placeholder
           ),
           const SizedBox(height: 10),
-          Text(viewModel.user!.name ?? 'No Name', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(
+            viewModel.user!.name ?? 'No Name',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 5),
-          Text(viewModel.user!.email ?? 'No Email', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+          Text(
+            "@${viewModel.user?.userName ?? (viewModel.user!.email ?? 'No Email')}",
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProfileScreen(user: viewModel.user!)),
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditProfileScreen(user: viewModel.user!),
+                ),
               );
             },
             child: const Text('Edit Profile'),
@@ -82,9 +99,19 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          _buildProfileOption(context, Icons.calendar_today, 'My Reading Plan', () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const DailyReadingPlanScreen()));
-          }),
+          _buildProfileOption(
+            context,
+            Icons.calendar_today,
+            'My Reading Plan',
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DailyReadingPlanScreen(),
+                ),
+              );
+            },
+          ),
           _buildProfileOption(context, Icons.bookmark, 'My Library', () {
             // TODO: Navigate to library screen
           }),
@@ -94,7 +121,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileOption(BuildContext context, IconData icon, String title, VoidCallback onTap) {
+  Widget _buildProfileOption(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
