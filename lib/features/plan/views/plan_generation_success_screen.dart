@@ -24,11 +24,13 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
     final pace = dailyMinutes <= 15
         ? 'Light'
         : dailyMinutes <= 30
-            ? 'Moderate'
-            : 'Deep';
+        ? 'Moderate'
+        : 'Deep';
 
     final durationText = durationDays == 365 ? '1 Year' : '$durationDays Days';
-    final topicsText = topics.isEmpty ? 'No specific topics selected' : topics.join(', ');
+    final topicsText = topics.isEmpty
+        ? 'No specific topics selected'
+        : topics.join(', ');
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -38,7 +40,7 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
 
                 // Success Icon / Header
                 Container(
@@ -49,12 +51,12 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.celebration_rounded,
-                    size: 64,
+                    size: 44,
                     color: primary,
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 22),
 
                 Text(
                   'Your Custom Plan is Ready!',
@@ -97,7 +99,9 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
                           color: primary.withOpacity(0.12),
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(24),
+                          ),
                         ),
                         child: Text(
                           '$durationText Personalized Journey',
@@ -167,12 +171,17 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                     icon: const Icon(Icons.play_arrow_rounded, size: 28),
                     label: const Text(
                       'Start My Journey Now',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
                       foregroundColor: theme.colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       elevation: 0,
                     ),
                   ),
@@ -203,13 +212,11 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
     bool isMultiLine = false,
   }) {
     return Row(
-      crossAxisAlignment: isMultiLine ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: isMultiLine
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       children: [
-        Icon(
-          icon,
-          size: 28,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        Icon(icon, size: 28, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 20),
         Expanded(
           child: Column(

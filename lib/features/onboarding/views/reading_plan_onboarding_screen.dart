@@ -50,11 +50,10 @@ class ReadingPlanOnboardingScreenState
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
-                      vertical: 16,
+                      vertical: 10,
                     ),
                     child: Column(
                       children: [
-                        const SizedBox(height: 20),
                         ...[
                           'Deepen My Faith',
                           'Find Peace & Comfort',
@@ -306,6 +305,7 @@ class ReadingPlanOnboardingScreenState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
@@ -441,8 +441,9 @@ class ReadingPlanOnboardingScreenState
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 32),
-        Expanded(child: child),
+        const SizedBox(height: 40),
+
+        child,
       ],
     );
   }

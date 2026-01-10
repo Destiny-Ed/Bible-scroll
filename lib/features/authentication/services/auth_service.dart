@@ -49,7 +49,9 @@ class AuthService {
     if (user == null) return;
     final doc = await _firestore.collection('profiles').doc(user.uid).get();
     if (!doc.exists) {
-      final String? fcmToken = await _firebaseMessaging.getToken();
+      final String? fcmToken = Platform.isAndroid
+          ? (await _firebaseMessaging.getToken())
+          : (await _firebaseMessaging.getAPNSToken());
       await _firestore.collection('profiles').doc(user.uid).set({
         'email': user.email,
         'name': user.displayName,

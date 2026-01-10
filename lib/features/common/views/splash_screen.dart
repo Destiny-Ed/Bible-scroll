@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myapp/features/authentication/views/auth_screen.dart';
 import 'package:myapp/features/home/views/home_screen.dart';
+import 'package:myapp/features/onboarding/views/onboarding_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/features/authentication/viewmodels/auth_viewmodel.dart';
 
@@ -17,27 +18,24 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(
-      const Duration(seconds: 3),
-      () {
-        final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-        authViewModel.authStateChanges.listen((User? user) {
-          if (user == null) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (BuildContext context) => const AuthScreen(),
-              ),
-            );
-          } else {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (BuildContext context) => const HomeScreen(),
-              ),
-            );
-          }
-        });
-      },
-    );
+    Timer(const Duration(seconds: 3), () {
+      final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+      authViewModel.authStateChanges.listen((User? user) {
+        if (user == null) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext context) => const OnboardingScreen(),
+            ),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (BuildContext context) => const HomeScreen(),
+            ),
+          );
+        }
+      });
+    });
   }
 
   @override
