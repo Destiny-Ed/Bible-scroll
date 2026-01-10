@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -8,35 +7,40 @@ import 'dart:io';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Future<UserCredential> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+    final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+    final GoogleSignInAuthentication googleAuth = googleUser.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
+      // accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    final UserCredential userCredential = await _auth.signInWithCredential(credential);
+    final UserCredential userCredential = await _auth.signInWithCredential(
+      credential,
+    );
     await _createUserProfile(userCredential.user);
     return userCredential;
   }
 
   Future<UserCredential> signInWithApple() async {
-    final AuthorizationCredentialAppleID appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-    );
+    final AuthorizationCredentialAppleID appleCredential =
+        await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
     final OAuthProvider oAuthProvider = OAuthProvider("apple.com");
     final AuthCredential credential = oAuthProvider.credential(
-      idToken: String.fromCharCodes(appleCredential.identityToken!),
-      accessToken: String.fromCharCodes(appleCredential.authorizationCode),
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
     );
-    final UserCredential userCredential = await _auth.signInWithCredential(credential);
+    final UserCredential userCredential = await _auth.signInWithCredential(
+      credential,
+    );
     await _createUserProfile(userCredential.user);
     return userCredential;
   }

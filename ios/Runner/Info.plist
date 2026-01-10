@@ -45,5 +45,26 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.907339903934-k0acfm3vm2ipuui3b9vnn88k6stq6jp9</string>
+			</array>
+		</dict>
+	</array>
+
+	<key>GIDClientID</key>
+	<string>907339903934-k0acfm3vm2ipuui3b9vnn88k6stq6jp9.apps.googleusercontent.com</string>
+
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>In order to select photos, App requires access to your photo library.</string>
 </dict>
 </plist>
