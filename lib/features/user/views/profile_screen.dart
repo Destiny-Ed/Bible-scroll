@@ -2,76 +2,104 @@ import 'package:flutter/material.dart';
 import 'package:myapp/features/plan/views/daily_reading_plan_screen.dart';
 import 'package:myapp/features/user/views/edit_profile_screen.dart';
 import 'package:myapp/features/user/views/settings_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../viewmodels/profile_viewmodel.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const Center(child: Text('Not logged in'));
+    }
+
+    // Fetch user profile
+    final profileViewModel = Provider.of<ProfileViewModel>(context, listen: false);
+    profileViewModel.getUserProfile(user.uid);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('My Profile'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            _buildProfileHeader(context),
-            const SizedBox(height: 32),
-            _buildProfileOption(context, Icons.edit, 'Edit Profile', () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileScreen()));
-            }),
-            _buildProfileOption(context, Icons.book, 'My Reading Plan', () {
-               Navigator.push(context, MaterialPageRoute(builder: (context) => const DailyReadingPlanScreen()));
-            }),
-            _buildProfileOption(context, Icons.bookmark, 'My Library', () {
-              // TODO: Navigate to library screen
-            }),
-            _buildProfileOption(context, Icons.share, 'Share Profile', () {}),
-          ],
-        ),
+      body: Consumer<ProfileViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.user == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return ListView(
+            children: [
+              _buildProfileHeader(context, viewModel),
+              const SizedBox(height: 20),
+              _buildProfileOptions(context),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
-    return Column(
-      children: [
-        const CircleAvatar(
-          radius: 60,
-          backgroundImage: NetworkImage('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop'),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'John Doe',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '@john.doe',
-          style: Theme.of(context).textTheme.labelSmall,
-        ),
-      ],
+  Widget _buildProfileHeader(BuildContext context, ProfileViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          const CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Placeholder
+          ),
+          const SizedBox(height: 10),
+          Text(viewModel.user!.name ?? 'No Name', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 5),
+          Text(viewModel.user!.email ?? 'No Email', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditProfileScreen(user: viewModel.user!)),
+              );
+            },
+            child: const Text('Edit Profile'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileOptions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
+          _buildProfileOption(context, Icons.calendar_today, 'My Reading Plan', () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const DailyReadingPlanScreen()));
+          }),
+          _buildProfileOption(context, Icons.bookmark, 'My Library', () {
+            // TODO: Navigate to library screen
+          }),
+          _buildProfileOption(context, Icons.share, 'Share Profile', () {}),
+        ],
+      ),
     );
   }
 
   Widget _buildProfileOption(BuildContext context, IconData icon, String title, VoidCallback onTap) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-        onTap: onTap,
-      ),
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: onTap,
     );
   }
 }

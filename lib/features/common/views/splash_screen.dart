@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:myapp/features/onboarding/views/onboarding_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/features/authentication/views/auth_screen.dart';
+import 'package:myapp/features/home/views/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:myapp/features/authentication/viewmodels/auth_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,11 +19,24 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(
       const Duration(seconds: 3),
-      () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) => const OnboardingScreen(),
-        ),
-      ),
+      () {
+        final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+        authViewModel.authStateChanges.listen((User? user) {
+          if (user == null) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (BuildContext context) => const AuthScreen(),
+              ),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (BuildContext context) => const HomeScreen(),
+              ),
+            );
+          }
+        });
+      },
     );
   }
 

@@ -1,77 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/user_model.dart';
+import '../viewmodels/profile_viewmodel.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  const EditProfileScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  final UserModel user;
+
+  const EditProfileScreen({super.key, required this.user});
+
+  @override
+  _EditProfileScreenState createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late String _name;
+  late String _email;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = widget.user.name ?? '';
+    _email = widget.user.email ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final profileViewModel = Provider.of<ProfileViewModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            _buildAvatar(context),
-            const SizedBox(height: 32),
-            _buildTextField(context, label: 'Full Name', initialValue: 'John Doe'),
-            const SizedBox(height: 16),
-            _buildTextField(context, label: 'Username', initialValue: 'john.doe'),
-            const SizedBox(height: 16),
-            _buildTextField(context, label: 'Bio', maxLines: 4, initialValue: 'Sharing light, one verse at a time. Follow for daily inspiration and stories of faith, hope, and love.'),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Save Changes'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAvatar(BuildContext context) {
-    return Center(
-      child: Stack(
-        children: [
-          const CircleAvatar(
-            radius: 60,
-            backgroundImage: NetworkImage('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop'),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: Theme.of(context).primaryColor,
-              child: IconButton(
-                icon: const Icon(Icons.camera_alt, color: Colors.black, size: 20),
-                onPressed: () {
-                  // Handle image picking
-                },
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                initialValue: _name,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) => value!.isEmpty ? 'Please enter a name' : null,
+                onSaved: (value) => _name = value!,
               ),
-            ),
+              TextFormField(
+                initialValue: _email,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) => value!.isEmpty ? 'Please enter an email' : null,
+                onSaved: (value) => _email = value!,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    final updatedUser = UserModel(
+                      name: _name,
+                      email: _email,
+                      // fcmToken and platform are not edited here, so we keep the old values
+                      fcmToken: widget.user.fcmToken,
+                      platform: widget.user.platform,
+                    );
+                    profileViewModel.updateUserProfile(widget.user.id!, updatedUser).then((_) {
+                      Navigator.pop(context);
+                    });
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(BuildContext context, {required String label, String? initialValue, int maxLines = 1}) {
-    return TextFormField(
-      initialValue: initialValue,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
-          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );

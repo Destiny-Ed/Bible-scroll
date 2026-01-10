@@ -1,14 +1,28 @@
+class UserModel {
+  final String? id;
+  final String? name;
+  final String? email;
+  final String? fcmToken;
+  final String? platform;
 
-class User {
-  final String name;
-  final String profileImageUrl;
-  final List<String> watchHistory;
-  final List<String> achievements;
+  UserModel({this.id, this.name, this.email, this.fcmToken, this.platform});
 
-  User({
-    required this.name,
-    required this.profileImageUrl,
-    this.watchHistory = const [],
-    this.achievements = const [],
-  });
+  factory UserModel.fromMap(Map<String, dynamic> data, {String? id}) {
+    return UserModel(
+      id: id,
+      name: data['name'],
+      email: data['email'],
+      fcmToken: data['fcmToken'],
+      platform: data['platform'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+      'fcmToken': fcmToken,
+      'platform': platform,
+    };
+  }
 }
