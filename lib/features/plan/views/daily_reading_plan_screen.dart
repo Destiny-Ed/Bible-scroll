@@ -24,9 +24,8 @@ class DailyReadingPlanScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             children: [
-              const SizedBox(height: 20),
               _buildPlanOverview(context),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               _buildTodaysReading(context),
             ],
           ),
@@ -40,7 +39,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(13),
@@ -135,7 +134,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
     bool isCompleted,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 5),
       elevation: 2,
       shadowColor: Colors.black.withAlpha(13),
       color: isCompleted

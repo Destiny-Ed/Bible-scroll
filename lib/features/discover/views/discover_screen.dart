@@ -13,12 +13,12 @@ class DiscoverScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           _buildFeaturedContent(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildBrowseBooksButton(context),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildSectionHeader(context, 'Popular Topics'),
           _buildTopicsGrid(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildSectionHeader(context, 'Recommended Videos'),
           _buildVideosList(context),
         ],
@@ -106,9 +106,9 @@ class DiscoverScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 2.5,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 3,
       ),
       itemCount: topics.length,
       itemBuilder: (context, index) {
