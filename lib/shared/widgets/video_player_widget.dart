@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
-class VideoPlayerWidget extends StatefulWidget {
-  final VideoPlayerController controller;
+class VideoPlayerWidget extends StatelessWidget {
+  final String videoUrl;
 
-  const VideoPlayerWidget({super.key, required this.controller});
+  const VideoPlayerWidget({super.key, required this.videoUrl});
 
-  @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
-}
-
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
-    return widget.controller.value.isInitialized
-        ? AspectRatio(
-            aspectRatio: widget.controller.value.aspectRatio,
-            child: VideoPlayer(widget.controller),
-          )
-        : const Center(child: CircularProgressIndicator());
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('Video Player Placeholder'),
+    );
   }
 }
