@@ -1,26 +1,43 @@
-
 import 'package:flutter/material.dart';
+import 'package:myapp/features/bible_reading/models/book_model.dart';
 import 'package:myapp/features/bible_reading/services/reading_detail_service.dart';
 import 'package:myapp/features/bible_reading/viewmodels/reading_detail_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 import 'package:myapp/shared/widgets/video_player_widget.dart';
 
-class ReadingDetailScreen extends StatelessWidget {
-  final String book;
+class ReadingDetailScreen extends StatefulWidget {
+  final Book book;
   final int chapter;
 
-  const ReadingDetailScreen({super.key, required this.book, required this.chapter});
+  const ReadingDetailScreen({
+    super.key,
+    required this.book,
+    required this.chapter,
+  });
+
+  @override
+  State<ReadingDetailScreen> createState() => _ReadingDetailScreenState();
+}
+
+class _ReadingDetailScreenState extends State<ReadingDetailScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ReadingDetailViewModel(ReadingDetailService())..fetchVerses(book, chapter),
+      create: (_) =>
+          ReadingDetailViewModel(ReadingDetailService())
+            ..fetchVerses(widget.book.name, widget.chapter),
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('$book $chapter'),
+            title: Text('${widget.book} ${widget.chapter}'),
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'Reading'),
@@ -28,12 +45,7 @@ class ReadingDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-          body: TabBarView(
-            children: [
-              _buildReadingTab(),
-              _buildVideoTab(),
-            ],
-          ),
+          body: TabBarView(children: [_buildReadingTab(), _buildVideoTab()]),
         ),
       ),
     );
@@ -68,7 +80,9 @@ class ReadingDetailScreen extends StatelessWidget {
   Widget _buildVideoTab() {
     // Replace with your actual video player
     return const Center(
-      child: VideoPlayerWidget(videoUrl: 'https://www.youtube.com/watch?v=your_video_id'),
+      child: VideoPlayerWidget(
+        videoUrl: 'https://www.youtube.com/watch?v=your_video_id',
+      ),
     );
   }
 }
