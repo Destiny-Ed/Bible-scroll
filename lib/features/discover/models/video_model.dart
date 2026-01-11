@@ -58,34 +58,63 @@ class Video {
       viewsCount: map['viewsCount'] ?? 0,
       commentsList:
           (map['commentsList'] as List<dynamic>?)
-              ?.map((c) => Comments.fromMap(c))
+              ?.map((c) => Comments.fromMap(c as Map<String, dynamic>))
               .toList() ??
           [],
       isLiked: isLiked,
       isBookmarked: isBookmarked,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'chapterTitle': chapterTitle,
+      'chapter': chapter,
+      'description': description,
+      'videoUrl': videoUrl,
+      'thumbnailUrl': thumbnailUrl,
+      'uploader': uploader,
+      'avatarUrl': avatarUrl,
+      'topic': topic,
+      'likesCount': likesCount,
+      'bookmarksCount': bookmarksCount,
+      'commentsCount': commentsCount,
+      'viewsCount': viewsCount,
+      // commentsList is usually stored in subcollection, so we don't serialize it here
+      // If you want to cache some preview comments, you can add:
+      // 'commentsList': commentsList.map((c) => c.toMap()).toList(),
+    }..removeWhere(
+      (key, value) => value == null || (value is String && value.isEmpty),
+    );
+  }
 }
 
 class Comments {
   final String id;
+  final String commenterId;
   final String comment;
-  final String commenter;
+  final String commenterName;
   final String avatarUrl;
+  final DateTime timeStamp;
 
   Comments({
     required this.id,
+    required this.commenterId,
     required this.comment,
-    required this.commenter,
+    required this.commenterName,
     required this.avatarUrl,
+    required this.timeStamp,
   });
 
   factory Comments.fromMap(Map<String, dynamic> map) {
     return Comments(
       id: map['id'] ?? '',
       comment: map['comment'] ?? '',
-      commenter: map['commenter'] ?? '',
+      commenterId: map['commenterId'] ?? '',
       avatarUrl: map['avatarUrl'] ?? '',
+      commenterName: map['commenterName'] ?? '',
+      timeStamp: DateTime.parse(map['avatarUrl'] ?? ""),
     );
   }
 
@@ -93,7 +122,9 @@ class Comments {
     return {
       'id': id,
       'comment': comment,
-      'commenter': commenter,
+      'commenterId': commenterId,
+      'commenterName': commenterName,
+      'timeStamp': timeStamp.toIso8601String(),
       'avatarUrl': avatarUrl,
     };
   }

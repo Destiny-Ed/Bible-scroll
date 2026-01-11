@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/discover/models/video_model.dart';
+import 'package:myapp/features/library/viewmodels/library_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -13,30 +16,46 @@ class LibraryScreen extends StatelessWidget {
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Liked Videos'),
-              Tab(text: 'Bookmarked Chapters'),
+              Tab(text: 'Bookmarked Videos'),
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildSavedVideosList(context),
-            _buildBookmarkedChaptersList(context),
-          ],
+        body: Consumer<LibraryViewModel>(
+          builder: (context, vm, _) {
+            if (vm.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return TabBarView(
+              children: [
+                _buildVideoList(vm.likedVideos, 'No liked videos yet'),
+                _buildVideoList(
+                  vm.bookmarkedVideos,
+                  'No bookmarked videos yet',
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildSavedVideosList(BuildContext context) {
+  Widget _buildVideoList(List<Video> videos, String emptyText) {
+    if (videos.isEmpty) {
+      return Center(child: Text(emptyText));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: 4, // Replace with actual data
+      itemCount: videos.length,
       itemBuilder: (context, index) {
+        final video = videos[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16.0),
           child: InkWell(
             onTap: () {
-              // Navigate to video detail screen
+              // Navigate to video detail / player
             },
             child: Row(
               children: [
@@ -46,7 +65,9 @@ class LibraryScreen extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                   ),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
+                    video.thumbnailUrl.isNotEmpty
+                        ? video.thumbnailUrl
+                        : 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8',
                     width: 120,
                     height: 90,
                     fit: BoxFit.cover,
@@ -59,14 +80,16 @@ class LibraryScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'The Story of David',
-                          style: Theme.of(context).textTheme.bodyMedium
+                          video.chapterTitle,
+                          style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
-                          'A short animated summary.',
-                          style: Theme.of(context).textTheme.labelSmall,
+                          video.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
@@ -74,44 +97,6 @@ class LibraryScreen extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildBookmarkedChaptersList(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemCount: 6, // Replace with actual data
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 20,
-            ),
-            leading: Icon(
-              Icons.bookmark,
-              color: Theme.of(context).primaryColor,
-            ),
-            title: Text(
-              'Genesis ${index + 1}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            subtitle: const Text(
-              'A brief summary of the chapter...',
-              style: TextStyle(color: Colors.grey),
-            ),
-            trailing: const Icon(
-              Icons.arrow_forward_ios,
-              size: 18,
-              color: Colors.grey,
-            ),
-            onTap: () {
-              // Navigate to chapter detail
-            },
           ),
         );
       },

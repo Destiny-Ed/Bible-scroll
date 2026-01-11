@@ -2,17 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:hive_ce/hive_ce.dart';
-import 'package:path_provider/path_provider.dart';
 import '../models/book_model.dart'; // Assuming Verse is defined here
 
 class BibleService {
   static String _bibleApiUrl(String bookName, int chapter) =>
       'https://bible-api.com/$bookName+$chapter?translation=kjv';
-
-  static Future<void> initHive() async {
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    Hive.init(appDocumentDir.path);
-  }
 
   Future<List<Verse>> fetchAndCacheVerses(String bookName, int chapter) async {
     final box = await Hive.openBox('bibleVerses');

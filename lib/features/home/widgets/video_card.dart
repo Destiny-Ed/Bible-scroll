@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:myapp/features/discover/models/video_model.dart';
 import 'package:myapp/features/discover/views/chapter_detail_screen.dart';
-import 'package:myapp/features/discover/widgets/comments_modal_sheet.dart';
+import 'package:myapp/features/common/widgets/comments_modal_sheet.dart';
 import 'package:myapp/features/home/viewmodels/feed_view_model.dart';
 import 'package:myapp/features/home/viewmodels/video_player_viewmodel.dart';
 import 'package:particles_flutter/engine.dart';

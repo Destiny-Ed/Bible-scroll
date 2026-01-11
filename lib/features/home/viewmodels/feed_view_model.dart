@@ -1,67 +1,67 @@
-//  final List<Video> dummyVideos = [
-//     Video(
-//       id: '1',
-//       chapterTitle: 'Genesis 1: The Creation',
-//       videoUrl:
-//           'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-//       description: 'In the beginning God created the heavens and the earth.',
-//       likesCount: 120,
-//       commentsCount: 34,
-//       chapter: 'Genesis 1',
-//       thumbnailUrl: '',
-//       uploader: '',
-//       avatarUrl: '',
-//       topic: '',
-//       bookmarksCount: 30,
-//       commentsList: [],
-//     ),
-//     Video(
-//       id: '2',
-//       chapterTitle: 'Exodus 20: The Ten Commandments',
-//       videoUrl:
-//           'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-//       description:
-//           'I am the LORD your God, who brought you out of Egypt, out of the land of slavery.',
-//       likesCount: 250,
-//       commentsCount: 68,
-//       chapter: 'Exodus 20',
-//       thumbnailUrl: '',
-//       uploader: '',
-//       avatarUrl: '',
-//       topic: '',
-//       bookmarksCount: 30,
-//       commentsList: [],
-//     ),
-//     Video(
-//       id: '3',
-//       chapterTitle: 'Psalm 23: The Lord is My Shepherd',
-//       videoUrl:
-//           'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
-//       description: 'The LORD is my shepherd; I shall not want.',
-//       likesCount: 500,
-//       commentsCount: 120,
-//       chapter: 'Psalm 23',
-//       thumbnailUrl: '',
-//       uploader: '',
-//       avatarUrl: '',
-//       topic: '',
-//       bookmarksCount: 30,
-//       commentsList: [],
-//     ),
-//   ];
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gal/gal.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:myapp/features/discover/models/video_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+final List<Video> dummyVideos = [
+  Video(
+    id: '1',
+    chapterTitle: 'Genesis 1: The Creation',
+    videoUrl:
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    description: 'In the beginning God created the heavens and the earth.',
+    likesCount: 120,
+    commentsCount: 34,
+    chapter: 'Genesis 1',
+    thumbnailUrl: '',
+    uploader: '',
+    avatarUrl: '',
+    topic: '',
+    bookmarksCount: 30,
+    commentsList: [],
+  ),
+  Video(
+    id: '2',
+    chapterTitle: 'Exodus 20: The Ten Commandments',
+    videoUrl:
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+    description:
+        'I am the LORD your God, who brought you out of Egypt, out of the land of slavery.',
+    likesCount: 250,
+    commentsCount: 68,
+    chapter: 'Exodus 20',
+    thumbnailUrl: '',
+    uploader: '',
+    avatarUrl: '',
+    topic: '',
+    bookmarksCount: 30,
+    commentsList: [],
+  ),
+  Video(
+    id: '3',
+    chapterTitle: 'Psalm 23: The Lord is My Shepherd',
+    videoUrl:
+        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
+    description: 'The LORD is my shepherd; I shall not want.',
+    likesCount: 500,
+    commentsCount: 120,
+    chapter: 'Psalm 23',
+    thumbnailUrl: '',
+    uploader: '',
+    avatarUrl: '',
+    topic: '',
+    bookmarksCount: 30,
+    commentsList: [],
+  ),
+];
 
 class FeedViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -70,7 +70,7 @@ class FeedViewModel extends ChangeNotifier {
   List<Video> _videos = [];
   List<Video> get videos => _videos;
 
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   String? _error;
@@ -82,13 +82,42 @@ class FeedViewModel extends ChangeNotifier {
   DocumentSnapshot? _lastDocument;
 
   FeedViewModel() {
-    fetchVideos();
+    _loadCachedFeed();
+    fetchVideos(reset: true);
+  }
+
+  // Load from Hive cache first (instant UI)
+  Future<void> _loadCachedFeed() async {
+    final box = Hive.box<List<dynamic>>('feedVideos');
+    final cached = box.get('currentFeed');
+
+    if (cached != null && cached.isNotEmpty) {
+      try {
+        _videos = cached.map((json) => Video.fromMap(json)).toList();
+        notifyListeners();
+      } catch (e) {
+        debugPrint('Cache parse error: $e');
+      }
+    }
+  }
+
+  // Save current feed to Hive
+  Future<void> _cacheFeed() async {
+    final box = Hive.box<List<dynamic>>('feedVideos');
+    final jsonList = _videos.map((v) => v.toMap()).toList();
+    await box.put('currentFeed', jsonList);
   }
 
   Future<void> fetchVideos({bool reset = false}) async {
+    _videos = dummyVideos;
+    notifyListeners();
+    return;
     if (_isLoading || (!_hasMore && !reset)) return;
 
-    _isLoading = true;
+    if (_videos.isEmpty) {
+      _isLoading = true;
+    }
+
     if (reset) {
       _videos = [];
       _lastDocument = null;
@@ -102,18 +131,24 @@ class FeedViewModel extends ChangeNotifier {
           .orderBy('createdAt', descending: true)
           .limit(10);
 
+      log("Query::: ${query}");
+
       if (_lastDocument != null) {
         query = query.startAfterDocument(_lastDocument!);
       }
 
       final snapshot = await query.get();
 
+      log(snapshot.toString());
+
       if (snapshot.docs.isEmpty) {
         _hasMore = false;
       } else {
         _lastDocument = snapshot.docs.last;
 
-        final List<Future<Video>> videoFutures = snapshot.docs.map((doc) async {
+        final List<Video> newVideos = [];
+
+        for (final doc in snapshot.docs) {
           final data = doc.data();
           bool isLiked = false;
           bool isBookmarked = false;
@@ -136,17 +171,26 @@ class FeedViewModel extends ChangeNotifier {
             isBookmarked = bookmarkSnap.exists;
           }
 
-          return Video.fromMap(
-            {...data, 'id': doc.id},
-            isLiked: isLiked,
-            isBookmarked: isBookmarked,
+          newVideos.add(
+            Video.fromMap(
+              {...data, 'id': doc.id},
+              isLiked: isLiked,
+              isBookmarked: isBookmarked,
+            ),
           );
-        }).toList();
+        }
 
-        final newVideos = await Future.wait(videoFutures);
-        _videos.addAll(newVideos);
+        if (reset) {
+          _videos = newVideos;
+        } else {
+          _videos.addAll(newVideos);
+        }
+
+        // Cache the fresh data
+        await _cacheFeed();
       }
     } catch (e) {
+      log(e.toString());
       _error = e.toString();
     }
 
@@ -297,7 +341,7 @@ class FeedViewModel extends ChangeNotifier {
     await commentRef.set({
       'comment': text,
       'commenter': _currentUserId,
-      'avatarUrl': '', // fetch from user profile
+      'avatarUrl': '', //TODO: fetch from user profile
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -305,74 +349,71 @@ class FeedViewModel extends ChangeNotifier {
       'commentsCount': FieldValue.increment(1),
     });
 
-    // Optimistic update in feed if needed
     notifyListeners();
   }
 
   Future<void> incrementShare(String videoId) async {
     await _firestore.collection('videos').doc(videoId).update({
-      'sharesCount': FieldValue.increment(
-        1,
-      ), // add sharesCount to model if needed
+      'sharesCount': FieldValue.increment(1),
     });
     notifyListeners();
   }
 
-  Future<void> downloadVideoWithWatermark(
-    String videoUrl,
-    String videoId,
-  ) async {
-    try {
-      // 1. Request storage permission
-      if (!await _requestStoragePermission()) return;
+  // Future<void> downloadVideoWithWatermark(
+  //   String videoUrl,
+  //   String videoId,
+  // ) async {
+  //   try {
+  //     // 1. Request storage permission
+  //     if (!await _requestStoragePermission()) return;
 
-      // 2. Download video
-      final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/temp_$videoId.mp4';
+  //     // 2. Download video
+  //     final tempDir = await getTemporaryDirectory();
+  //     final tempPath = '${tempDir.path}/temp_$videoId.mp4';
 
-      await Dio().download(
-        videoUrl,
-        tempPath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            final progress = (received / total * 100).toStringAsFixed(0);
-            // Update UI progress if needed (e.g. via notifier)
-            print('Download progress: $progress%');
-          }
-        },
-      );
+  //     await Dio().download(
+  //       videoUrl,
+  //       tempPath,
+  //       onReceiveProgress: (received, total) {
+  //         if (total != -1) {
+  //           final progress = (received / total * 100).toStringAsFixed(0);
+  //           // Update UI progress if needed (e.g. via notifier)
+  //           print('Download progress: $progress%');
+  //         }
+  //       },
+  //     );
 
-      // 3. Add watermark using ffmpeg
-      final finalPath = '${tempDir.path}/watermarked_$videoId.mp4';
-      final logoPath = 'assets/logo.png'; // your app logo
+  //     // 3. Add watermark using ffmpeg
+  //     final finalPath = '${tempDir.path}/watermarked_$videoId.mp4';
+  //     final logoPath = 'assets/logo.png'; // your app logo
 
-      final session = await FFmpegKit.execute(
-        '-i $tempPath -i $logoPath -filter_complex "overlay=W-w-20:H-h-20" -codec:a copy $finalPath',
-      );
+  //     final session = await FFmpegKit.execute(
+  //       '-i $tempPath -i $logoPath -filter_complex "overlay=W-w-20:H-h-20" -codec:a copy $finalPath',
+  //     );
 
-      final returnCode = await session.getReturnCode();
-      if (ReturnCode.isSuccess(returnCode)) {
-        //Save to gallery
-        final success = await Gal.putVideo(finalPath);
-        // if (success) {
-        //   print('Video saved to gallery with watermark!');
-        // } else {
-        //   print('Failed to save to gallery');
-        // }
-      } else {
-        print('FFmpeg error: ${await session.getLogs()}');
-      }
+  //     final returnCode = await session.getReturnCode();
+  //     if (ReturnCode.isSuccess(returnCode)) {
+  //       //Save to gallery
+  //       final success = await Gal.putVideo(finalPath);
+  //       // if (success) {
+  //       //   print('Video saved to gallery with watermark!');
+  //       // } else {
+  //       //   print('Failed to save to gallery');
+  //       // }
+  //     } else {
+  //       print('FFmpeg error: ${await session.getLogs()}');
+  //     }
 
-      // Clean up temp files
-      File(tempPath).deleteSync();
-      File(finalPath).deleteSync();
-    } catch (e) {
-      print('Download failed: $e');
-    }
-  }
+  //     // Clean up temp files
+  //     File(tempPath).deleteSync();
+  //     File(finalPath).deleteSync();
+  //   } catch (e) {
+  //     print('Download failed: $e');
+  //   }
+  // }
 
-  Future<bool> _requestStoragePermission() async {
-    final status = await Permission.storage.request();
-    return status.isGranted;
-  }
+  // Future<bool> _requestStoragePermission() async {
+  //   final status = await Permission.storage.request();
+  //   return status.isGranted;
+  // }
 }
