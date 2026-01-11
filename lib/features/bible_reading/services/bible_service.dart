@@ -1,41 +1,76 @@
-
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:hive_ce/hive_ce.dart';
 import 'package:path_provider/path_provider.dart';
+import '../models/book_model.dart'; // Assuming Verse is defined here
 
 class BibleService {
-  static const String _bibleApiUrl =
-      'https://getbible.net/json?passage={BOOK_NAME}{CHAPTER}';
+  static String _bibleApiUrl(String bookName, int chapter) =>
+      'https://bible-api.com/$bookName+$chapter?translation=kjv';
 
-  Future<void> initHive() async {
+  static Future<void> initHive() async {
     final appDocumentDir = await getApplicationDocumentsDirectory();
     Hive.init(appDocumentDir.path);
   }
 
-  Future<String> fetchAndCacheVerses(String bookName, int chapter) async {
+  Future<List<Verse>> fetchAndCacheVerses(String bookName, int chapter) async {
     final box = await Hive.openBox('bibleVerses');
-    final cacheKey = '\$bookName-\$chapter';
+    final cacheKey =
+        '$bookName-$chapter-kjv'; //TODO: Include translation for future-proofing
 
-    // Check if the data is already in the cache
+    // Try cache first
     if (box.containsKey(cacheKey)) {
-      return box.get(cacheKey);
+      final cachedData = box.get(cacheKey);
+      if (cachedData is List) {
+        try {
+          return cachedData
+              .map((e) => Verse.fromJson(e as Map<String, dynamic>))
+              .toList();
+        } catch (e) {
+          log('Cache parse error: $e → will refetch');
+        }
+      }
     }
 
-    final response = await http.get(Uri.parse(
-        _bibleApiUrl.replaceFirst('{BOOK_NAME}', bookName).replaceFirst('{CHAPTER}', chapter.toString())));
+    print("No cached version");
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final verses = (data['book'] as List)
-          .map((book) => (book['chapter'] as Map<String, dynamic>).values.map((verse) => verse['verse']).join('\\n'))
-          .join('\\n\\n');
+    //  Fetch from API
+    try {
+      final url = _bibleApiUrl(bookName, chapter);
+      log('Fetching Bible chapter: $url');
 
-      // Cache the fetched data
-      await box.put(cacheKey, verses);
-      return verses;
-    } else {
-      throw Exception('Failed to load Bible verses');
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+
+        log('API response received: ${data['reference']}');
+
+        // Parse the verses array
+        final List<dynamic> versesJson = data['verses'] as List<dynamic>? ?? [];
+
+        final List<Verse> verses = versesJson.map((verseJson) {
+          final map = verseJson as Map<String, dynamic>;
+          return Verse(
+            verse: map['verse'] as int? ?? 0,
+            text: (map['text'] as String?)?.trim() ?? '',
+          );
+        }).toList();
+
+        // Cache as JSON-serializable list
+        final jsonList = verses.map((v) => v.toJson()).toList();
+        await box.put(cacheKey, jsonList);
+
+        log('Cached ${verses.length} verses for $cacheKey');
+        return verses;
+      } else {
+        log('API error: ${response.statusCode} - ${response.body}');
+        throw Exception('Failed to load Bible verses: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Bible fetch error: $e');
+      rethrow;
     }
   }
 }
