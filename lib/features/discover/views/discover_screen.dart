@@ -1,27 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/bible_reading/views/book_list_screen.dart';
+import 'package:myapp/features/discover/viewmodels/discover_viewmodel.dart';
+import 'package:myapp/features/discover/views/topic_detail_screen.dart';
 import 'package:myapp/features/discover/views/video_detail_screen.dart';
+import 'package:provider/provider.dart';
 
 class DiscoverScreen extends StatelessWidget {
   const DiscoverScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Discover')),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildFeaturedContent(context),
-          const SizedBox(height: 16),
-          _buildBrowseBooksButton(context),
-          const SizedBox(height: 16),
-          _buildSectionHeader(context, 'Popular Topics'),
-          _buildTopicsGrid(),
-          const SizedBox(height: 16),
-          _buildSectionHeader(context, 'Recommended Videos'),
-          _buildVideosList(context),
-        ],
+    return ChangeNotifierProvider(
+      create: (_) => DiscoverViewModel(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Discover')),
+        body: Consumer<DiscoverViewModel>(
+          builder: (context, viewModel, child) {
+            if (viewModel.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                _buildFeaturedContent(context),
+                const SizedBox(height: 24),
+                _buildBrowseBooksButton(context),
+                const SizedBox(height: 24),
+                _buildSectionHeader(context, 'Popular Topics'),
+                _buildTopicsGrid(context, viewModel),
+                const SizedBox(height: 24),
+                _buildSectionHeader(context, 'Recommended Videos'),
+                _buildVideosList(context, viewModel),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -99,8 +113,7 @@ class DiscoverScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopicsGrid() {
-    final topics = ['Faith', 'Love', 'Hope', 'Prayer', 'Wisdom', 'Grace'];
+  Widget _buildTopicsGrid(BuildContext context, DiscoverViewModel viewModel) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -110,14 +123,22 @@ class DiscoverScreen extends StatelessWidget {
         mainAxisSpacing: 10,
         childAspectRatio: 3,
       ),
-      itemCount: topics.length,
+      itemCount: viewModel.topics.length,
       itemBuilder: (context, index) {
+        final topic = viewModel.topics[index];
         return Card(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TopicDetailScreen(topicName: topic.name),
+                ),
+              );
+            },
             child: Center(
               child: Text(
-                topics[index],
+                topic.name,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontSize: 18),
@@ -129,12 +150,13 @@ class DiscoverScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVideosList(BuildContext context) {
+  Widget _buildVideosList(BuildContext context, DiscoverViewModel viewModel) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: 3,
+      itemCount: viewModel.videos.length,
       itemBuilder: (context, index) {
+        final video = viewModel.videos[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16.0),
           child: InkWell(
@@ -154,7 +176,7 @@ class DiscoverScreen extends StatelessWidget {
                     bottomLeft: Radius.circular(16),
                   ),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
+                    video.thumbnailUrl,
                     width: 120,
                     height: 90,
                     fit: BoxFit.cover,
@@ -167,13 +189,13 @@ class DiscoverScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'The Story of David',
+                          video.chapterTitle,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'A short animated summary.',
+                          video.description,
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ],

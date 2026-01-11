@@ -148,7 +148,7 @@ class _VideoCardState extends State<VideoCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.video.verseText,
+            widget.video.description,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.white70),

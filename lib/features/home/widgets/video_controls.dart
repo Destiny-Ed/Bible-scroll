@@ -34,7 +34,7 @@ class VideoControls extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            video.verseText,
+            video.description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(color: Colors.white70, fontSize: 16),
@@ -51,7 +51,7 @@ class VideoControls extends StatelessWidget {
         const SizedBox(height: 20),
         _buildActionButton(context, icon: Icons.comment, label: video.comments.toString()),
         const SizedBox(height: 20),
-        _buildActionButton(context, icon: Icons.bookmark, label: 'Save'),
+        _buildActionButton(context, icon: Icons.bookmark, label: video.bookmarks.toString()),
         const SizedBox(height: 20),
         _buildActionButton(context, icon: Icons.share, label: 'Share'),
       ],
