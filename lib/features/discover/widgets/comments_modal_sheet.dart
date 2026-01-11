@@ -1,8 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/features/discover/models/video_model.dart';
+import 'package:myapp/features/home/viewmodels/feed_view_model.dart';
+import 'package:provider/provider.dart';
 
-class CommentsModalSheet extends StatelessWidget {
-  const CommentsModalSheet({super.key});
+class CommentsModalSheet extends StatefulWidget {
+  final String videoId;
+  const CommentsModalSheet({super.key, required this.videoId});
 
+  @override
+  State<CommentsModalSheet> createState() => _CommentsModalSheetState();
+}
+
+class _CommentsModalSheetState extends State<CommentsModalSheet> {
+  final _commentController = TextEditingController();
+  final _firestore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -39,57 +51,83 @@ class CommentsModalSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  controller: controller,
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
-                            ),
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: _firestore
+                      .collection('videos')
+                      .doc(widget.videoId)
+                      .collection('comments')
+                      .orderBy('createdAt', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final comments = snapshot.data!.docs;
+
+                    if (comments.isEmpty) {
+                      return const Center(
+                        child: Text('No comments yet. Be the first!'),
+                      );
+                    }
+
+                    return ListView.builder(
+                      controller: controller,
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final data = Comments.fromMap(
+                          comments[index].data() as Map<String, dynamic>,
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: data.avatarUrl.isEmpty
+                                    ? NetworkImage(
+                                        'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
+                                      )
+                                    : NetworkImage(data.avatarUrl),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'John Doe',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          data.commenter,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          // _formatTimestamp(data.timestamp),
+                                          "no timestamp",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '2h ago',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall,
-                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(data.comment),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  'This is a really insightful comment! I enjoyed the video.',
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -124,6 +162,7 @@ class CommentsModalSheet extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
+                controller: _commentController,
                 decoration: InputDecoration(
                   hintText: 'Add a comment...',
                   filled: true,
@@ -141,12 +180,30 @@ class CommentsModalSheet extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.send),
-              onPressed: () {},
+              onPressed: () async {
+                final text = _commentController.text.trim();
+                if (text.isEmpty) return;
+
+                final vm = context.read<FeedViewModel>();
+                await vm.addComment(widget.videoId, text);
+
+                _commentController.clear();
+              },
               color: Theme.of(context).primaryColor,
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatTimestamp(Timestamp? ts) {
+    if (ts == null) return '';
+    final date = ts.toDate();
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays > 0) return '${diff.inDays}d';
+    if (diff.inHours > 0) return '${diff.inHours}h';
+    if (diff.inMinutes > 0) return '${diff.inMinutes}m';
+    return 'now';
   }
 }

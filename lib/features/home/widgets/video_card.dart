@@ -6,6 +6,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:myapp/features/discover/models/video_model.dart';
 import 'package:myapp/features/discover/views/chapter_detail_screen.dart';
 import 'package:myapp/features/discover/widgets/comments_modal_sheet.dart';
+import 'package:myapp/features/home/viewmodels/feed_view_model.dart';
 import 'package:myapp/features/home/viewmodels/video_player_viewmodel.dart';
 import 'package:particles_flutter/engine.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +81,12 @@ class _VideoCardState extends State<VideoCard>
       // _playerController!.controller.seekTo(Duration.zero);
     }
   }
+
+  //   _buildIconButton(
+  //   Icons.download,
+  //   'Download',
+  //   onTap: () => vm.downloadVideoWithWatermark(widget.video.videoUrl, widget.video.id),
+  // ),
 
   @override
   void dispose() {
@@ -243,43 +250,57 @@ class _VideoCardState extends State<VideoCard>
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _buildIconButton(Icons.favorite, widget.video.likes.toString()),
+        _buildIconButton(
+          Icons.favorite,
+          widget.video.likesCount.toString(),
+          onTap: () {
+            final vm = context.read<FeedViewModel>();
+            vm.toggleLike(widget.video.id);
+          },
+        ),
         const SizedBox(height: 20),
         GestureDetector(
           onTap: () {
             showMaterialModalBottomSheet(
               backgroundColor: Colors.transparent,
               context: context,
-              builder: (context) => const CommentsModalSheet(),
+              builder: (context) =>
+                  CommentsModalSheet(videoId: widget.video.id),
             );
           },
           child: _buildIconButton(
             Icons.comment,
-            widget.video.comments.toString(),
+            widget.video.commentsCount.toString(),
           ),
         ),
         const SizedBox(height: 20),
 
-        _buildIconButton(Icons.bookmark, widget.video.bookmarks.toString()),
+        _buildIconButton(
+          Icons.bookmark,
+          widget.video.bookmarksCount.toString(),
+        ),
         const SizedBox(height: 20),
         _buildIconButton(Icons.share, '34'),
       ],
     );
   }
 
-  Widget _buildIconButton(IconData icon, String text) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white, size: 30),
-        if (text.isNotEmpty)
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+  Widget _buildIconButton(IconData icon, String text, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.white, size: 30),
+          if (text.isNotEmpty)
+            Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 

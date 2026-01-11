@@ -12,7 +12,7 @@ class LibraryScreen extends StatelessWidget {
           title: const Text('My Library'),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Saved Videos'),
+              Tab(text: 'Liked Videos'),
               Tab(text: 'Bookmarked Chapters'),
             ],
           ),

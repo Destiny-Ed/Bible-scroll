@@ -47,11 +47,11 @@ class VideoControls extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        _buildActionButton(context, icon: Icons.favorite, label: video.likes.toString()),
+        _buildActionButton(context, icon: Icons.favorite, label: video.likesCount.toString()),
         const SizedBox(height: 20),
-        _buildActionButton(context, icon: Icons.comment, label: video.comments.toString()),
+        _buildActionButton(context, icon: Icons.comment, label: video.commentsCount.toString()),
         const SizedBox(height: 20),
-        _buildActionButton(context, icon: Icons.bookmark, label: video.bookmarks.toString()),
+        _buildActionButton(context, icon: Icons.bookmark, label: video.bookmarksCount.toString()),
         const SizedBox(height: 20),
         _buildActionButton(context, icon: Icons.share, label: 'Share'),
       ],

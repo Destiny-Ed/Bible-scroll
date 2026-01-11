@@ -33,8 +33,6 @@ class BibleService {
       }
     }
 
-    print("No cached version");
-
     //  Fetch from API
     try {
       final url = _bibleApiUrl(bookName, chapter);

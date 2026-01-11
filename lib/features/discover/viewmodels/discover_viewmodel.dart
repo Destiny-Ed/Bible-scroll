@@ -44,10 +44,10 @@ class DiscoverViewModel extends ChangeNotifier {
         avatarUrl:
             'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Faith',
-        likes: 1200,
+        likesCount: 1200,
         chapter: '',
-        bookmarks: 30,
-        comments: 10,
+        bookmarksCount: 30,
+        commentsCount: 10,
         commentsList: [],
       ),
       Video(
@@ -61,10 +61,10 @@ class DiscoverViewModel extends ChangeNotifier {
         avatarUrl:
             'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Wisdom',
-        likes: 2500,
+        likesCount: 2500,
         chapter: '',
-        bookmarks: 45,
-        comments: 23,
+        bookmarksCount: 45,
+        commentsCount: 23,
         commentsList: [],
       ),
       Video(
@@ -78,10 +78,10 @@ class DiscoverViewModel extends ChangeNotifier {
         avatarUrl:
             'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Hope',
-        likes: 5000,
+        likesCount: 5000,
         chapter: '',
-        bookmarks: 5,
-        comments: 6,
+        bookmarksCount: 5,
+        commentsCount: 6,
         commentsList: [],
       ),
     ];

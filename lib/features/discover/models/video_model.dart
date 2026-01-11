@@ -8,11 +8,15 @@ class Video {
   final String uploader;
   final String avatarUrl;
   final String topic;
-  final int likes;
-  final int bookmarks;
-  final int comments;
+  final int likesCount;
+  final int bookmarksCount;
+  final int commentsCount;
+  final int viewsCount;
   final List<Comments> commentsList;
 
+  // UI-only flags (not stored in Firestore)
+  bool isLiked;
+  bool isBookmarked;
 
   Video({
     required this.id,
@@ -24,13 +28,20 @@ class Video {
     required this.uploader,
     required this.avatarUrl,
     required this.topic,
-    required this.likes,
-    required this.bookmarks,
-    required this.comments,
-    required this.commentsList,
+    this.likesCount = 0,
+    this.bookmarksCount = 0,
+    this.commentsCount = 0,
+    this.viewsCount = 0,
+    this.commentsList = const [],
+    this.isLiked = false,
+    this.isBookmarked = false,
   });
 
-  factory Video.fromMap(Map<String, dynamic> map) {
+  factory Video.fromMap(
+    Map<String, dynamic> map, {
+    bool isLiked = false,
+    bool isBookmarked = false,
+  }) {
     return Video(
       id: map['id'] ?? '',
       chapterTitle: map['chapterTitle'] ?? '',
@@ -41,36 +52,20 @@ class Video {
       uploader: map['uploader'] ?? 'Anonymous',
       avatarUrl: map['avatarUrl'] ?? '',
       topic: map['topic'] ?? '',
-      likes: map['likes'] ?? 0,
-      bookmarks: map['bookmarks'] ?? 0,
-      comments: map['comments'] ?? 0,
-      commentsList: List<Comments>.from(
-        map['commentsList']?.map((x) => Comments.fromMap(x)) ?? [],
-      ),
+      likesCount: map['likesCount'] ?? 0,
+      bookmarksCount: map['bookmarksCount'] ?? 0,
+      commentsCount: map['commentsCount'] ?? 0,
+      viewsCount: map['viewsCount'] ?? 0,
+      commentsList:
+          (map['commentsList'] as List<dynamic>?)
+              ?.map((c) => Comments.fromMap(c))
+              .toList() ??
+          [],
+      isLiked: isLiked,
+      isBookmarked: isBookmarked,
     );
   }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'chapterTitle': chapterTitle,
-      'chapter': chapter,
-      'description': description,
-      'videoUrl': videoUrl,
-      'thumbnailUrl': thumbnailUrl,
-      'uploader': uploader,
-      'avatarUrl': avatarUrl,
-      'topic': topic,
-      'likes': likes,
-      'bookmarks': bookmarks,
-      'comments': comments,
-      'commentsList': commentsList.map((x) => x.toMap()).toList(),
-    };
-  }
-
-
 }
-
 
 class Comments {
   final String id;
