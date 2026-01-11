@@ -4,12 +4,25 @@ import 'package:provider/provider.dart';
 import '../viewmodels/feed_view_model.dart';
 import '../widgets/video_card.dart';
 
-class FeedScreen extends StatelessWidget {
+class FeedScreen extends StatefulWidget {
   const FeedScreen({super.key});
 
   @override
+  State<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends State<FeedScreen>
+    with AutomaticKeepAliveClientMixin {
+  int _currentPage = 0;
+  final PreloadPageController _pageController = PreloadPageController();
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    final feedViewModel = Provider.of<FeedViewModel>(context);
+    super.build(context);
+    final feedViewModel = context.watch<FeedViewModel>();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -38,13 +51,25 @@ class FeedScreen extends StatelessWidget {
         // ],
       ),
       body: PreloadPageView.builder(
+        controller: _pageController,
         scrollDirection: Axis.vertical,
         itemCount: feedViewModel.videos.length,
+        onPageChanged: (index) {
+          setState(() => _currentPage = index);
+        },
         preloadPagesCount: 5,
         itemBuilder: (context, index) {
-          return VideoCard(video: feedViewModel.videos[index]);
+          final video = feedViewModel.videos[index];
+          final isCurrentVisible = index == _currentPage;
+          return VideoCard(video: video, isCurrentVisible: isCurrentVisible);
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }

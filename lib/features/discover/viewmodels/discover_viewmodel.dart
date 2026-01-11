@@ -39,10 +39,10 @@ class DiscoverViewModel extends ChangeNotifier {
         description: 'A short animated summary.',
         videoUrl: 'https://example.com/video1.mp4',
         thumbnailUrl:
-            'https://images.unsplash.com/photo-1524672322242-4365e8424a68?q=80&w=2070&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
         uploader: 'Bible Stories',
         avatarUrl:
-            'https://yt3.ggpht.com/ytc/AKedOLQUD_a-4_f-h_sJt-t_s_s-A_u_u-U_U_U_U=s900-c-k-c0x00ffffff-no-rj',
+            'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Faith',
         likes: 1200,
         chapter: '',
@@ -56,10 +56,10 @@ class DiscoverViewModel extends ChangeNotifier {
         description: 'A deep dive into Jesus\' teachings.',
         videoUrl: 'https://example.com/video2.mp4',
         thumbnailUrl:
-            'https://images.unsplash.com/photo-1509377452285-05451e0b5712?q=80&w=2070&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
         uploader: 'The Gospel Project',
         avatarUrl:
-            'https://yt3.ggpht.com/ytc/AKedOLQUD_a-4_f-h_sJt-t_s_s-A_u_u-U_U_U_U=s900-c-k-c0x00ffffff-no-rj',
+            'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Wisdom',
         likes: 2500,
         chapter: '',
@@ -73,10 +73,10 @@ class DiscoverViewModel extends ChangeNotifier {
         description: 'Understanding the end times.',
         videoUrl: 'https://example.com/video3.mp4',
         thumbnailUrl:
-            'https://images.unsplash.com/photo-1518065202573-8d31139a3f29?q=80&w=2070&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
         uploader: 'Prophecy Unveiled',
         avatarUrl:
-            'https://yt3.ggpht.com/ytc/AKedOLQUD_a-4_f-h_sJt-t_s_s-A_u_u-U_U_U_U=s900-c-k-c0x00ffffff-no-rj',
+            'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2080&auto=format&fit=crop',
         topic: 'Hope',
         likes: 5000,
         chapter: '',

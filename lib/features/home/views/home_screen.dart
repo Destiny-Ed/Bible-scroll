@@ -42,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
       //   children: ,
       // ),
       body: IndexedStack(
-        key: ValueKey(_selectedIndex),
         index: _selectedIndex,
         children: [
           FeedScreen(),
