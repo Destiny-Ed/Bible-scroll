@@ -8,6 +8,15 @@ class ProfileViewModel extends ChangeNotifier {
   UserModel? _user;
   UserModel? get user => _user;
 
+  bool get showAdmin => _esterCount >= 30;
+
+  int _esterCount = 0;
+
+  void incrementEsterCount() {
+    _esterCount++;
+    notifyListeners();
+  }
+
   Future<void> getUserProfile(String uid) async {
     _user = await _profileService.getUserProfile(uid);
     notifyListeners();

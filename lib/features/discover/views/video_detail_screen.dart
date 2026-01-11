@@ -1,124 +1,164 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/discover/models/video_model.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:myapp/features/discover/viewmodels/discover_viewmodel.dart';
 
-class VideoDetailScreen extends StatelessWidget {
-  const VideoDetailScreen({super.key});
+class VideoDetailScreen extends StatefulWidget {
+  final Video video;
+
+  const VideoDetailScreen({super.key, required this.video});
+
+  @override
+  State<VideoDetailScreen> createState() => _VideoDetailScreenState();
+}
+
+class _VideoDetailScreenState extends State<VideoDetailScreen> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.video.videoUrl))
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+        _controller.addListener(_checkVideoCompletion);
+      });
+  }
+
+  void _checkVideoCompletion() {
+    if (_controller.value.position >= _controller.value.duration - const Duration(seconds: 2)) {
+      final vm = context.read<DiscoverViewModel>();
+      vm.markVideoAsWatched(widget.video.id);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_checkVideoCompletion);
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<DiscoverViewModel>();
+    final upNext = vm.getUpNextVideos(widget.video.id, widget.video.topic);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Now Playing')),
+      appBar: AppBar(
+        title: Text(widget.video.chapterTitle),
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Video Player
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                  image: const DecorationImage(
-                    image: NetworkImage(
-                      'https://images.unsplash.com/photo-1593509497293-94637355156a?q=80&w=2070&auto=format&fit=crop',
-                    ),
-                    fit: BoxFit.cover,
+              child: _controller.value.isInitialized
+                  ? Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        VideoPlayer(_controller),
+                        _controller.value.isPlaying
+                            ? const SizedBox.shrink()
+                            : IconButton(
+                                icon: const Icon(Icons.play_circle_fill, size: 80, color: Colors.white70),
+                                onPressed: () => _controller.play(),
+                              ),
+                      ],
+                    )
+                  : const Center(child: CircularProgressIndicator()),
+            ),
+
+            // Video Info
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.video.chapterTitle,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.play_circle_fill,
-                    color: Colors.white,
-                    size: 64,
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.video.description,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      Chip(label: Text(widget.video.topic), backgroundColor: Colors.blue.shade100),
+                      Chip(label: Text('${widget.video.likesCount} likes')),
+                      Chip(label: Text('${widget.video.viewsCount} views')),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Finding Peace in Psalms',
-              style: Theme.of(context).textTheme.titleLarge,
+
+            // Up Next Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Up Next',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'A guided meditation through the most beloved Psalms. This video will help you find tranquility and hope in times of uncertainty.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const Divider(height: 40),
-            _buildSectionHeader(context, 'Up Next'),
-            _buildUpNextList(),
+            const SizedBox(height: 12),
+
+            if (upNext.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('No more videos to watch in this series!'),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: upNext.length,
+                itemBuilder: (context, index) {
+                  final nextVideo = upNext[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          nextVideo.thumbnailUrl,
+                          width: 80,
+                          height: 60,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      title: Text(nextVideo.chapterTitle, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: Text(nextVideo.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      trailing: const Icon(Icons.play_arrow_rounded),
+                      onTap: () {
+                        vm.markVideoAsWatched(widget.video.id); // Mark current as watched
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => VideoDetailScreen(video: nextVideo),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+
+            const SizedBox(height: 80),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
-    );
-  }
-
-  Widget _buildUpNextList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 2, // Number of items in the 'Up Next' list
-      itemBuilder: (context, index) {
-        // Example data - replace with your actual data
-        final titles = ['The Story of Moses', 'The Parables of Jesus'];
-        final subtitles = ['An animated journey', 'Lessons for modern times'];
-        final imageUrls = [
-          'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop',
-        ];
-
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          child: InkWell(
-            onTap: () {
-              // Handle navigation to the next video
-            },
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                  child: Image.network(
-                    imageUrls[index],
-                    width: 120,
-                    height: 90,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          titles[index],
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          subtitles[index],
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/admin/views/admin_screen.dart';
+import 'package:myapp/features/library/views/library_screen.dart';
 import 'package:myapp/features/plan/views/daily_reading_plan_screen.dart';
 import 'package:myapp/features/user/views/edit_profile_screen.dart';
 import 'package:myapp/features/user/views/settings_screen.dart';
@@ -25,7 +27,10 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: GestureDetector(
+          onTap: () => profileViewModel.incrementEsterCount(),
+          child: const Text('My Profile'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -47,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
             children: [
               _buildProfileHeader(context, viewModel),
               const SizedBox(height: 20),
-              _buildProfileOptions(context),
+              _buildProfileOptions(context, viewModel: viewModel),
             ],
           );
         },
@@ -94,7 +99,10 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileOptions(BuildContext context) {
+  Widget _buildProfileOptions(
+    BuildContext context, {
+    required ProfileViewModel viewModel,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -113,8 +121,20 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           _buildProfileOption(context, Icons.bookmark, 'My Library', () {
-            // TODO: Navigate to library screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LibraryScreen()),
+            );
           }),
+          if (viewModel.showAdmin)
+            _buildProfileOption(context, Icons.bookmark, 'Admin', () {
+              Navigator.push(
+                context,
+
+                MaterialPageRoute(builder: (context) => const AdminScreen()),
+              );
+            }),
+
           _buildProfileOption(context, Icons.share, 'Share Profile', () {}),
         ],
       ),

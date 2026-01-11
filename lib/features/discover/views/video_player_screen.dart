@@ -28,11 +28,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               ),
             ),
             child: const Center(
-              child: Icon(
-                Icons.play_arrow,
-                color: Colors.white,
-                size: 80,
-              ),
+              child: Icon(Icons.play_arrow, color: Colors.white, size: 80),
             ),
           ),
         ),

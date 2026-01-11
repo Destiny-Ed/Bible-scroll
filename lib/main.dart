@@ -2,10 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:myapp/app.dart';
+import 'package:myapp/features/admin/viewmodels/admin_viewmodel.dart';
 import 'package:myapp/features/authentication/viewmodels/auth_viewmodel.dart';
 import 'package:myapp/features/bible_reading/services/bible_service.dart';
 import 'package:myapp/features/bible_reading/viewmodels/reading_view_model.dart';
 import 'package:myapp/features/common/viewmodels/theme_view_model.dart';
+import 'package:myapp/features/discover/viewmodels/discover_viewmodel.dart';
 import 'package:myapp/features/home/viewmodels/feed_view_model.dart';
 import 'package:myapp/features/home/viewmodels/video_player_viewmodel.dart';
 import 'package:myapp/features/library/viewmodels/library_viewmodel.dart';
@@ -33,6 +35,8 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ReadingPlanViewModel()),
         ChangeNotifierProvider(create: (context) => VideoPlayerViewModel()),
         ChangeNotifierProvider(create: (context) => LibraryViewModel()),
+        ChangeNotifierProvider(create: (context) => AdminViewModel()),
+        ChangeNotifierProvider(create: (context) => DiscoverViewModel()),
         ChangeNotifierProvider(
           create: (_) => BibleReadingViewModel(BibleService()),
         ),
