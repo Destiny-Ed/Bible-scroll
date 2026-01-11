@@ -25,13 +25,15 @@ lib/
 │   │   └── widgets/
 │   ├── discover/
 │   │   ├── models/
+│   │   │   ├── topic_model.dart
 │   │   │   └── video_model.dart
 │   │   ├── views/
 │   │   │   ├── chapter_detail_screen.dart
-│   │   │   └── discover_screen.dart
-│   │   └── widgets/
-│   │       ├── comments_modal_sheet.dart
-│   │       └── video_card.dart
+│   │   │   ├── discover_screen.dart
+│   │   │   ├── topic_detail_screen.dart
+│   │   │   └── video_detail_screen.dart
+│   │   └── viewmodels/
+│   │       └── discover_viewmodel.dart
 │   ├── home/
 │   │   ├── views/
 │   │   │   └── feed_screen.dart
@@ -64,3 +66,48 @@ The application employs a modern and visually appealing design, adhering to Mate
 
 The application utilizes the `provider` package for state management, with a `ChangeNotifier` to manage the application's theme.
 
+## Firebase Schema
+
+This section outlines the data structure for the app's features in Firebase.
+
+### Discover Feature
+
+*   **`videos` collection:**
+    *   `videoId` (document ID)
+    *   `title` (string)
+    *   `description` (string)
+    *   `videoUrl` (string)
+    *   `thumbnailUrl` (string)
+    *   `topic` (string) - e.g., "Faith", "Love"
+    *   `likes` (number)
+    *   `comments` (sub-collection)
+        *   `commentId` (document ID)
+        *   `userId` (string)
+        *   `commentText` (string)
+        *   `timestamp` (timestamp)
+
+*   **`topics` collection:**
+    *   `topicId` (document ID)
+    *   `name` (string)
+    *   `imageUrl` (string)
+
+### Reading Plan Feature
+
+*   **`reading_plans` collection:**
+    *   `planId` (document ID)
+    *   `planName` (string)
+    *   `description` (string)
+    *   `duration` (number) - in days
+    *   `daily_readings` (sub-collection)
+        *   `day` (document ID, e.g., "1", "2")
+        *   `book` (string)
+        *   `chapter` (number)
+        *   `verses` (string) - e.g., "1-15"
+
+*   **`user_progress` collection:**
+    *   `userId` (document ID)
+    *   `reading_plans` (sub-collection)
+        *   `planId` (document ID)
+        *   `completedDays` (array of numbers)
+        *   `startDate` (timestamp)
+        *   `lastCompletedDate` (timestamp)
