@@ -22,6 +22,9 @@ class DailyReadingPlanViewModel extends ChangeNotifier {
   bool _hasNoPlan = false;
   bool get hasNoPlan => _hasNoPlan;
 
+  bool _isMarkingComplete = false;
+  bool get isMarkingComplete => _isMarkingComplete;
+
   DailyReadingPlanViewModel() {
     _loadPlanAndProgress();
   }
@@ -62,6 +65,59 @@ class DailyReadingPlanViewModel extends ChangeNotifier {
     await _loadPlanAndProgress();
   }
 
+  Future<void> markChapterAsRead(String chapterTitle) async {
+    if (_userId == null || _progress == null) return;
+
+    _isMarkingComplete = true;
+    notifyListeners();
+
+    try {
+      await _firestore.runTransaction((transaction) async {
+        final userRef = _firestore.collection('users').doc(_userId);
+        final snapshot = await transaction.get(userRef);
+
+        final progress = snapshot.data()?['readingProgress'] ?? {};
+        final lastRead = progress['lastReadDate'] as Timestamp?;
+        final lastDate = lastRead?.toDate();
+        final today = DateTime.now();
+
+        int newStreak = progress['streak'] ?? 0;
+        int newCompleted = (progress['completedDays'] ?? 0) + 1;
+        int currentDay = (progress['currentDay'] ?? 1);
+
+        // Streak logic
+        if (lastDate == null) {
+          newStreak = 1; // First read
+        } else {
+          final diffDays = today.difference(lastDate).inDays;
+          if (diffDays == 0) {
+            // Same day - don't increment streak, just update
+          } else if (diffDays == 1) {
+            newStreak++; // Consecutive
+          } else {
+            newStreak = 1; // Broken streak
+          }
+        }
+
+        transaction.update(userRef, {
+          'readingProgress': {
+            'currentDay': currentDay,
+            'completedDays': newCompleted,
+            'lastReadDate': FieldValue.serverTimestamp(),
+            'streak': newStreak,
+            'chaptersRead': FieldValue.arrayUnion([chapterTitle]),
+          },
+        });
+      });
+
+      // Refresh UI after successful update
+      await _loadPlanAndProgress();
+    } catch (e) {
+      _error = 'Failed to mark as read: $e';
+      debugPrint('Mark read error: $e');
+    }
+  }
+
   // Generate dynamic plan name (fallback if not stored)
   String get planName {
     if (_plan == null) return 'Your Journey';
@@ -77,9 +133,21 @@ class DailyReadingPlanViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> get todaysReading {
     // Replace with real chapter generation logic later
     return [
-      {'title': 'Genesis 1-2', 'subtitle': 'The Creation Story', 'completed': true},
-      {'title': 'John 1', 'subtitle': 'The Word Became Flesh', 'completed': false},
-      {'title': 'Psalms 23', 'subtitle': 'The Lord is My Shepherd', 'completed': false},
+      {
+        'title': 'Genesis 1-2',
+        'subtitle': 'The Creation Story',
+        'completed': true,
+      },
+      {
+        'title': 'John 1',
+        'subtitle': 'The Word Became Flesh',
+        'completed': false,
+      },
+      {
+        'title': 'Psalms 23',
+        'subtitle': 'The Lord is My Shepherd',
+        'completed': false,
+      },
     ];
   }
 }
