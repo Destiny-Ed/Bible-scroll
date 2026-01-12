@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/features/discover/views/chapter_detail_screen.dart';
 import 'package:myapp/features/plan/view_model/daily_reading_plan_view.dart';
+import 'package:myapp/features/plan/view_model/reading_plan_view_model.dart';
+import 'package:myapp/features/plan/widgets/streak_calendar.dart';
 import 'package:provider/provider.dart';
 
 class DailyReadingPlanScreen extends StatelessWidget {
@@ -10,16 +14,22 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Consumer<DailyReadingPlanViewModel>(
       builder: (context, vm, child) {
         if (vm.isLoading) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
-    
+
         if (vm.error != null) {
           return Scaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline_rounded, size: 80, color: Colors.red),
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 80,
+                    color: Colors.red,
+                  ),
                   const SizedBox(height: 24),
                   Text(vm.error!, textAlign: TextAlign.center),
                   const SizedBox(height: 32),
@@ -33,7 +43,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
             ),
           );
         }
-    
+
         if (vm.hasNoPlan) {
           return Scaffold(
             body: Center(
@@ -42,10 +52,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.book_rounded, size: 80, color: Colors.grey),
                   const SizedBox(height: 24),
-                  const Text('No reading plan found', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'No reading plan found',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 16),
                   FilledButton.icon(
-                    onPressed: () => Navigator.pushNamed(context, '/plan-onboarding'),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/plan-onboarding'),
                     icon: const Icon(Icons.add),
                     label: const Text('Create Your Plan'),
                   ),
@@ -54,18 +68,21 @@ class DailyReadingPlanScreen extends StatelessWidget {
             ),
           );
         }
-    
+
         final planName = vm.planName;
         final totalDays = vm.totalDays;
         final completedDays = vm.completedDays;
         final streak = vm.streak;
         final progress = vm.getProgress;
         final todaysReadings = vm.todaysReading;
-    
+
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: AppBar(
-            title: const Text('My Journey', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text(
+              'My Journey',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             centerTitle: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -79,11 +96,31 @@ class DailyReadingPlanScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    _buildPlanOverview(context, planName, streak, completedDays, totalDays, progress),
-                    const SizedBox(height: 30),
+                    _buildPlanOverview(
+                      context,
+                      planName,
+                      streak,
+                      completedDays,
+                      totalDays,
+                      progress,
+                    ),
+                    const SizedBox(height: 20),
                     _buildTodaysReading(context, todaysReadings, vm),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 20),
                     _buildMotivationCard(context, streak),
+                    const SizedBox(height: 30),
+
+                    StreakCalendar(
+                      currentStreak: streak,
+                      lastReadDate:
+                          (context
+                                      .read<DailyReadingPlanViewModel>()
+                                      .progress?['lastReadDate']
+                                  as Timestamp)
+                              .toDate(),
+                      maxStreak:
+                          42, // Replace with real max streak if you track it
+                    ),
                     const SizedBox(height: 60),
                   ],
                 ),
@@ -95,7 +132,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlanOverview(BuildContext context, String planName, int streak, int completedDays, int totalDays, double progress) {
+  Widget _buildPlanOverview(
+    BuildContext context,
+    String planName,
+    int streak,
+    int completedDays,
+    int totalDays,
+    double progress,
+  ) {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
 
@@ -104,21 +148,54 @@ class DailyReadingPlanScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 8))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$totalDays-DAY JOURNEY', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primary)),
+          Text(
+            '$totalDays-DAY JOURNEY',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: primary,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(planName, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            planName,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStatColumn(context,'$streak', 'Day Streak', Icons.local_fire_department),
-              _buildStatColumn(context,'$completedDays', 'Days Completed', Icons.check_circle),
-              _buildStatColumn(context,'${(progress * 100).toStringAsFixed(0)}%', 'Progress', Icons.percent),
+              _buildStatColumn(
+                context,
+                '$streak',
+                'Day Streak',
+                Icons.local_fire_department,
+              ),
+              _buildStatColumn(
+                context,
+                '$completedDays',
+                'Days Completed',
+                Icons.check_circle,
+              ),
+              _buildStatColumn(
+                context,
+                '${(progress * 100).toStringAsFixed(0)}%',
+                'Progress',
+                Icons.percent,
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -136,19 +213,31 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatColumn(BuildContext context, String value, String label, IconData icon) {
+  Widget _buildStatColumn(
+    BuildContext context,
+    String value,
+    String label,
+    IconData icon,
+  ) {
     return Column(
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary, size: 32),
         const SizedBox(height: 8),
-        Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
       ],
     );
   }
 
-  Widget _buildTodaysReading(BuildContext context, List<Map<String, dynamic>> readings, DailyReadingPlanViewModel vm) {
+  Widget _buildTodaysReading(
+    BuildContext context,
+    List<Map<String, dynamic>> readings,
+    DailyReadingPlanViewModel vm,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -159,34 +248,65 @@ class DailyReadingPlanScreen extends StatelessWidget {
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
             elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            color: isCompleted ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            color: isCompleted
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Theme.of(context).colorScheme.surface,
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 12,
+                horizontal: 20,
+              ),
               leading: Icon(
                 isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade400,
+                color: isCompleted
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.grey.shade400,
                 size: 32,
               ),
-              title: Text(item['title'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              subtitle: Text(item['subtitle'], style: const TextStyle(color: Colors.grey)),
+              title: Text(
+                item['title'],
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              subtitle: Text(
+                item['subtitle'],
+                style: const TextStyle(color: Colors.grey),
+              ),
               trailing: isCompleted
                   ? const Icon(Icons.check, color: Colors.green, size: 28)
                   : IconButton(
-                      icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+                      icon: const Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green,
+                      ),
                       onPressed: vm.isMarkingComplete
                           ? null
                           : () async {
                               await vm.markChapterAsRead(item['title']);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Marked "${item['title']}" as read!')),
+                                SnackBar(
+                                  content: Text(
+                                    'Marked "${item['title']}" as read!',
+                                  ),
+                                ),
                               );
                             },
                       tooltip: 'Mark as Read',
                     ),
               onTap: () {
                 // Navigate to chapter/video reader
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterDetailScreen(chapterTitle: item['title'])));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ChapterDetailScreen(chapterTitle: item['title']),
+                  ),
+                );
               },
             ),
           );
@@ -197,10 +317,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
 
   Widget _buildMotivationCard(BuildContext context, int streak) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Theme.of(context).colorScheme.primary.withOpacity(0.15), Theme.of(context).colorScheme.surface],
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.15),
+            Theme.of(context).colorScheme.surface,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -208,16 +332,21 @@ class DailyReadingPlanScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('Keep Going!', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            'Keep Going!',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 12),
           Text(
             streak == 0
                 ? 'Start your streak today!'
                 : streak == 1
-                    ? 'Great first day! Keep going!'
-                    : streak < 7
-                        ? 'You’re on fire! $streak-day streak!'
-                        : 'Incredible! $streak days strong — God is proud!',
+                ? 'Great first day! Keep going!'
+                : streak < 7
+                ? 'You’re on fire! $streak-day streak!'
+                : 'Incredible! $streak days strong — God is proud!',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
