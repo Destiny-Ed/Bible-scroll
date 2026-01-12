@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/common/services/notification_services.dart';
 import 'package:myapp/features/plan/view_model/daily_reading_plan_view.dart';
-import 'package:myapp/features/plan/views/reading_plan_onboarding_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:myapp/features/bible_reading/views/chapter_detail_screen.dart'; // ← Your chapter reader
+// import 'package:myapp/features/video_player/video_player_screen.dart'; // ← If you have dedicated video player
 
 class DailyReadingPlanScreen extends StatelessWidget {
   const DailyReadingPlanScreen({super.key});
@@ -54,23 +56,11 @@ class DailyReadingPlanScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Create your personalized plan to start your journey!',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
                   FilledButton.icon(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const ReadingPlanOnboardingScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/plan-onboarding'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Create Plan'),
+                    label: const Text('Create Your Plan'),
                   ),
                 ],
               ),
@@ -78,12 +68,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
           );
         }
 
-        // Success state: Show real plan
         final planName = vm.planName;
         final totalDays = vm.totalDays;
         final completedDays = vm.completedDays;
         final streak = vm.streak;
         final progress = vm.getProgress;
+
+        // Example: today's readings (in real app, generate from currentDay + topics)
+        final todaysReadings = vm.todaysReading;
 
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
@@ -114,10 +106,12 @@ class DailyReadingPlanScreen extends StatelessWidget {
                       progress,
                     ),
                     const SizedBox(height: 30),
-                    _buildTodaysReading(context, vm.todaysReading),
-                    const SizedBox(height: 30),
-                    _buildMotivationCard(context, streak),
+                    _buildTodaysReading(context, todaysReadings),
                     const SizedBox(height: 40),
+                    _buildContinueButton(context, todaysReadings),
+                    const SizedBox(height: 40),
+                    _buildMotivationCard(context, streak),
+                    const SizedBox(height: 60),
                   ],
                 ),
               ),
@@ -128,6 +122,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
+  // ── Plan Overview Card ──────────────────────────────────────────────────────
   Widget _buildPlanOverview(
     BuildContext context,
     String planName,
@@ -148,7 +143,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -182,14 +177,12 @@ class DailyReadingPlanScreen extends StatelessWidget {
               ),
               _buildStatColumn(
                 context,
-
                 '$completedDays',
                 'Days Completed',
                 Icons.check_circle,
               ),
               _buildStatColumn(
                 context,
-
                 '${(progress * 100).toStringAsFixed(0)}%',
                 'Progress',
                 Icons.percent,
@@ -231,6 +224,7 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
+  // ── Today's Reading List ───────────────────────────────────────────────────
   Widget _buildTodaysReading(
     BuildContext context,
     List<Map<String, dynamic>> readings,
@@ -238,16 +232,45 @@ class DailyReadingPlanScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Today's Reading", style: Theme.of(context).textTheme.titleLarge),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Today's Reading",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            if (readings.any((r) => !(r['completed'] ?? false)))
+              TextButton(
+                onPressed: () {
+                  // Optional: Mark all as read (or navigate to first unread)
+                },
+                child: const Text('Mark All'),
+              ),
+          ],
+        ),
         const SizedBox(height: 16),
-        ...readings.map(
-          (item) => _buildReadingItem(
+        ...readings.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          return _buildReadingItem(
             context,
             item['title'],
             item['subtitle'],
             item['completed'] ?? false,
-          ),
-        ),
+            onTap: () {
+              // Navigate to the chapter/video reading screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChapterDetailScreen(
+                    chapterTitle: item['title'],
+                    // Pass chapter reference, videoUrl, etc. as needed
+                  ),
+                ),
+              );
+            },
+          );
+        }),
       ],
     );
   }
@@ -256,21 +279,23 @@ class DailyReadingPlanScreen extends StatelessWidget {
     BuildContext context,
     String title,
     String subtitle,
-    bool isCompleted,
-  ) {
+    bool isCompleted, {
+    required VoidCallback onTap,
+  }) {
     final theme = Theme.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: isCompleted
-          ? theme.colorScheme.primaryContainer
+          ? theme.colorScheme.primaryContainer.withOpacity(0.6)
           : theme.colorScheme.surface,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           vertical: 12,
           horizontal: 20,
         ),
+        onTap: onTap, // ← Now navigates!
         leading: Icon(
           isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
           color: isCompleted ? theme.colorScheme.primary : Colors.grey.shade400,
@@ -286,22 +311,50 @@ class DailyReadingPlanScreen extends StatelessWidget {
           size: 18,
           color: Colors.grey,
         ),
-        onTap: () {
-          // Navigate to chapter/video player
-        },
+      ),
+    );
+  }
+
+  // ── Continue Button (jumps to first unread item) ────────────────────────────
+  Widget _buildContinueButton(
+    BuildContext context,
+    List<Map<String, dynamic>> readings,
+  ) {
+    final unread = readings.where((r) => !(r['completed'] ?? false)).toList();
+
+    if (unread.isEmpty) {
+      return const SizedBox.shrink(); // All done today
+    }
+
+    return FilledButton.icon(
+      onPressed: () async {
+        // Find first unread and navigate
+        final firstUnread = unread.first;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChapterDetailScreen(
+              chapterTitle: firstUnread['title'],
+              // Add chapter/video reference as needed
+            ),
+          ),
+        );
+      },
+      icon: const Icon(Icons.play_arrow_rounded),
+      label: Text(
+        unread.length > 1
+            ? 'Continue Reading (${unread.length} left)'
+            : 'Continue Reading',
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      ),
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
 
   Widget _buildMotivationCard(BuildContext context, int streak) {
-    final messages = [
-      if (streak == 0) 'Start your streak today!',
-      if (streak == 1) 'Great first day! Keep it going!',
-      if (streak >= 2 && streak < 7) 'You’re on fire! $streak days strong!',
-      if (streak >= 7)
-        'Amazing! $streak-day streak — God is proud of your commitment!',
-    ];
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -325,9 +378,13 @@ class DailyReadingPlanScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            messages.isNotEmpty
-                ? messages.last
-                : 'Your consistency is making a difference!',
+            streak == 0
+                ? 'Start your streak today!'
+                : streak == 1
+                ? 'Great first day! Keep going!'
+                : streak < 7
+                ? 'You’re on fire! $streak-day streak!'
+                : 'Incredible! $streak days strong — God is proud!',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),

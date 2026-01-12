@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart';
 
@@ -8,13 +11,43 @@ class DailyNotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    tz_data.initializeTimeZones();
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    const AndroidInitializationSettings android = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+    const DarwinInitializationSettings iOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
-    await _notificationsPlugin.initialize(initializationSettings);
+    await _notificationsPlugin.initialize(
+      const InitializationSettings(android: android, iOS: iOS),
+    );
+
+    // Request permissions
+    if (Platform.isAndroid) {
+      final androidImpl = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      await androidImpl?.requestNotificationsPermission();
+      await androidImpl?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'daily_reading_channel',
+          'Daily Reading Reminders',
+          description: 'Notifications for daily reading reminder',
+          importance: Importance.high,
+        ),
+      );
+    } else if (Platform.isIOS) {
+      final iosImpl = _notificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      await iosImpl?.requestPermissions(alert: true, badge: true, sound: true);
+    }
   }
 
   static Future<void> scheduleDailyReminder(TimeOfDay time) async {
