@@ -1,62 +1,98 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myapp/features/plan/view_model/reading_plan_view_model.dart';
 
 class PlanService {
-  static const bool useDummyData =
-      true; // ← Change to false when ready for Firebase
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _userId = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous';
+  final String? _userId = FirebaseAuth.instance.currentUser?.uid;
 
-  Future<void> saveUserReadingPlan(ReadingPlanViewModel vm) async {
-    if (useDummyData) {
-      log('=== DUMMY MODE: Plan would be saved ===');
-      log('User ID: $_userId');
-      log('Goal: ${vm.selectedGoal}');
-      log('Daily minutes: ${vm.dailyTimeMinutes.round()}');
-      log('Duration days: ${vm.planDurationDays}');
-      log('Topics: ${vm.selectedTopics.join(", ")}');
-      log('Timestamp: ${DateTime.now()}');
-      return;
-    }
+  Future<void> saveReadingPlan(ReadingPlanViewModel vm) async {
+    if (_userId == null) throw Exception('User not authenticated');
 
-    try {
-      await _firestore.collection('users').doc(_userId).set({
-        'readingPlan': {
-          'goal': vm.selectedGoal,
-          'dailyMinutes': vm.dailyTimeMinutes.round(),
-          'durationDays': vm.planDurationDays,
-          'topics': vm.selectedTopics.toList(),
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-          'progress': {'currentDay': 1, 'completedDays': 0, 'streak': 0},
-        },
-      }, SetOptions(merge: true));
+    final planData = {
+      'goal': vm.selectedGoal ?? 'Not selected',
+      'dailyMinutes': vm.dailyTimeMinutes.round(),
+      'durationDays': vm.planDurationDays,
+      'topics': vm.selectedTopics.toList(),
+      'planName': _generatePlanName(vm),
+      'startDate': FieldValue.serverTimestamp(),
+      'createdAt': FieldValue.serverTimestamp(),
+    };
 
-      log('Reading plan saved successfully');
-    } catch (e) {
-      log('Error saving plan: $e');
-      rethrow;
-    }
+    await _firestore.collection('users').doc(_userId).set({
+      'readingPlan': planData,
+      'readingProgress': {
+        'currentDay': 1,
+        'completedDays': 0,
+        'lastReadDate': null,
+        'streak': 0,
+        'chaptersRead': [],
+      },
+    }, SetOptions(merge: true));
   }
 
-  // Future method you can call later in DailyReadingPlanScreen
-  Future<Map<String, dynamic>?> getUserReadingPlan() async {
-    if (useDummyData) {
-      return {
-        'goal': 'Find Peace & Comfort',
-        'dailyMinutes': 20,
-        'durationDays': 30,
-        'topics': ['Psalms', 'Faith', 'Prayer'],
-        'progress': {'currentDay': 6, 'completedDays': 5, 'streak': 5},
-        'planName': '30 Days of Peace: A Visual Journey',
-      };
-    }
+  Future<Map<String, dynamic>?> getReadingPlan() async {
+    if (_userId == null) return null;
 
     final doc = await _firestore.collection('users').doc(_userId).get();
     return doc.data()?['readingPlan'] as Map<String, dynamic>?;
+  }
+
+  Future<Map<String, dynamic>?> getReadingProgress() async {
+    if (_userId == null) return null;
+
+    final doc = await _firestore.collection('users').doc(_userId).get();
+    return doc.data()?['readingProgress'] as Map<String, dynamic>?;
+  }
+
+  /// Mark today's reading as complete & update streak
+  Future<void> markTodayComplete(List<String> chaptersReadToday) async {
+    if (_userId == null) return;
+
+    final progressRef = _firestore.collection('users').doc(_userId);
+
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(progressRef);
+      final progress = snapshot.data()?['readingProgress'] ?? {};
+
+      final lastRead = progress['lastReadDate'] as Timestamp?;
+      final lastDate = lastRead?.toDate();
+      final today = DateTime.now();
+
+      int newStreak = progress['streak'] ?? 0;
+
+      // Streak logic
+      if (lastDate == null) {
+        newStreak = 1; // First day
+      } else {
+        final diffDays = today.difference(lastDate).inDays;
+        if (diffDays == 1) {
+          newStreak++; // Consecutive day
+        } else if (diffDays > 1) {
+          newStreak = 1; // Streak broken
+        }
+        // else same day → don't increment
+      }
+
+      transaction.update(progressRef, {
+        'readingProgress': {
+          'currentDay': (progress['currentDay'] ?? 0) + 1,
+          'completedDays': FieldValue.increment(1),
+          'lastReadDate': FieldValue.serverTimestamp(),
+          'streak': newStreak,
+          'chaptersRead': FieldValue.arrayUnion(chaptersReadToday),
+        },
+      });
+    });
+  }
+
+  String _generatePlanName(ReadingPlanViewModel vm) {
+    if (vm.selectedTopics.isEmpty) return 'Personalized Bible Journey';
+    if (vm.selectedTopics.any(
+      (t) => t.contains('Peace') || t.contains('Comfort'),
+    )) {
+      return '${vm.planDurationDays}-Day Journey of Peace';
+    }
+    return '${vm.planDurationDays}-Day ${vm.selectedGoal ?? "Spiritual"} Adventure';
   }
 }

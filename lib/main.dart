@@ -11,6 +11,7 @@ import 'package:myapp/features/discover/viewmodels/discover_viewmodel.dart';
 import 'package:myapp/features/home/viewmodels/feed_view_model.dart';
 import 'package:myapp/features/home/viewmodels/video_player_viewmodel.dart';
 import 'package:myapp/features/library/viewmodels/library_viewmodel.dart';
+import 'package:myapp/features/plan/view_model/daily_reading_plan_view.dart';
 import 'package:myapp/features/plan/view_model/reading_plan_view_model.dart';
 import 'package:myapp/features/user/models/user_model.dart';
 import 'package:myapp/features/user/viewmodels/profile_viewmodel.dart';
@@ -37,6 +38,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LibraryViewModel()),
         ChangeNotifierProvider(create: (context) => AdminViewModel()),
         ChangeNotifierProvider(create: (context) => DiscoverViewModel()),
+        ChangeNotifierProvider(
+          create: (context) => DailyReadingPlanViewModel(),
+        ),
         ChangeNotifierProvider(
           create: (_) => BibleReadingViewModel(BibleService()),
         ),

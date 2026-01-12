@@ -8,10 +8,10 @@ class ReadingPlanOnboardingScreen extends StatefulWidget {
 
   @override
   State<ReadingPlanOnboardingScreen> createState() =>
-      ReadingPlanOnboardingScreenState();
+      _ReadingPlanOnboardingScreenState();
 }
 
-class ReadingPlanOnboardingScreenState
+class _ReadingPlanOnboardingScreenState
     extends State<ReadingPlanOnboardingScreen> {
   late PageController _pageController;
 
@@ -32,6 +32,7 @@ class ReadingPlanOnboardingScreenState
     final vm = context.watch<ReadingPlanViewModel>();
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
+    final surface = theme.colorScheme.surface;
 
     return Scaffold(
       body: SafeArea(
@@ -42,7 +43,7 @@ class ReadingPlanOnboardingScreenState
               physics: const BouncingScrollPhysics(),
               onPageChanged: vm.updatePage,
               children: [
-                // Step 1: Goal
+                // Step 1: Goal Selection
                 _buildStep(
                   title: "What's your main goal?",
                   subtitle:
@@ -50,7 +51,7 @@ class ReadingPlanOnboardingScreenState
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
-                      vertical: 10,
+                      vertical: 16,
                     ),
                     child: Column(
                       children: [
@@ -59,20 +60,13 @@ class ReadingPlanOnboardingScreenState
                           'Find Peace & Comfort',
                           'Understand the Bible Better',
                           'Wisdom, Guidance & Protection',
-                        ].map(
-                          (goal) => _buildGoalOption(
-                            vm: vm,
-                            title: goal,
-                            subtitle: _getGoalSubtitle(goal),
-                            icon: _getGoalIcon(goal),
-                          ),
-                        ),
+                        ].map((goal) => _buildGoalOption(vm, goal)),
                       ],
                     ),
                   ),
                 ),
 
-                // Step 2: Commitment
+                // Step 2: Commitment (Time & Duration)
                 _buildStep(
                   title: "How much time can you commit?",
                   subtitle: "Customize your pace and plan length",
@@ -88,7 +82,7 @@ class ReadingPlanOnboardingScreenState
               ],
             ),
 
-            // Bottom controls
+            // Bottom Controls (Dots + Continue)
             Positioned(
               bottom: 0,
               left: 0,
@@ -99,22 +93,19 @@ class ReadingPlanOnboardingScreenState
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      theme.colorScheme.surface.withOpacity(0.1),
-                      theme.colorScheme.surface,
-                    ],
+                    colors: [surface.withOpacity(0.1), surface],
                   ),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Dots
+                    // Progress Dots
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
                         3,
                         (i) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 400),
                           margin: const EdgeInsets.symmetric(horizontal: 6),
                           width: vm.currentPage == i ? 24 : 10,
                           height: 10,
@@ -129,60 +120,53 @@ class ReadingPlanOnboardingScreenState
                     ),
                     const SizedBox(height: 24),
 
-                    // Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                          onPressed: vm.currentPage == 0
-                              ? (vm.hasGoal
-                                    ? () => _animateToPage(vm, 1)
-                                    : null)
-                              : vm.currentPage == 1
-                              ? () => _animateToPage(vm, 2)
-                              : () async {
-                                  await vm.generatePlan();
-                                  if (context.mounted) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            PlanGenerationSuccessScreen(
-                                              goal:
-                                                  vm.selectedGoal ??
-                                                  "Not selected",
-                                              dailyMinutes: vm.dailyTimeMinutes
-                                                  .round(),
-                                              durationDays: vm.planDurationDays,
-                                              topics: vm.selectedTopics
-                                                  .toList(),
-                                            ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            vm.currentPage == 2
-                                ? 'Finish & Generate'
-                                : 'Continue',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    // Continue / Finish Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: FilledButton.icon(
+                        onPressed: vm.currentPage == 0
+                            ? (vm.hasGoal ? () => _animateToPage(vm, 1) : null)
+                            : vm.currentPage == 1
+                            ? () => _animateToPage(vm, 2)
+                            : () async {
+                                await vm.generatePlan();
+                                if (context.mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          PlanGenerationSuccessScreen(
+                                            goal:
+                                                vm.selectedGoal ??
+                                                "Not selected",
+                                            dailyMinutes: vm.dailyTimeMinutes
+                                                .round(),
+                                            durationDays: vm.planDurationDays,
+                                            topics: vm.selectedTopics.toList(),
+                                          ),
+                                    ),
+                                  );
+                                }
+                              },
+                        icon: vm.currentPage == 2
+                            ? const Icon(Icons.celebration)
+                            : const SizedBox.shrink(),
+                        label: Text(
+                          vm.currentPage == 2
+                              ? 'Finish & Generate Plan'
+                              : 'Continue',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -202,15 +186,41 @@ class ReadingPlanOnboardingScreenState
     );
   }
 
-  // Helper methods for goal cards...
-  Widget _buildGoalOption({
-    required ReadingPlanViewModel vm,
+  Widget _buildStep({
     required String title,
     required String subtitle,
-    required IconData icon,
+    required Widget child,
   }) {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            subtitle,
+            style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 15),
+        child,
+      ],
+    );
+  }
+
+  Widget _buildGoalOption(ReadingPlanViewModel vm, String title) {
     final isSelected = vm.selectedGoal == title;
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
 
     return GestureDetector(
       onTap: () => vm.selectGoal(title),
@@ -220,30 +230,23 @@ class ReadingPlanOnboardingScreenState
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer
+              ? primary.withOpacity(0.15)
               : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            color: isSelected ? primary : Colors.transparent,
             width: 2,
           ),
           boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.2),
-                    blurRadius: 12,
-                  ),
-                ]
+              ? [BoxShadow(color: primary.withOpacity(0.2), blurRadius: 12)]
               : null,
         ),
         child: Row(
           children: [
             Icon(
-              icon,
+              _getGoalIcon(title),
               size: 40,
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : Colors.grey.shade600,
+              color: isSelected ? primary : Colors.grey.shade600,
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -255,12 +258,12 @@ class ReadingPlanOnboardingScreenState
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? theme.colorScheme.primary : null,
+                      color: isSelected ? primary : null,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subtitle,
+                    _getGoalSubtitle(title),
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
@@ -413,38 +416,6 @@ class ReadingPlanOnboardingScreenState
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStep({
-    required String title,
-    required String subtitle,
-    required Widget child,
-  }) {
-    return Column(
-      children: [
-        const SizedBox(height: 40),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Text(
-            subtitle,
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 40),
-
-        child,
-      ],
     );
   }
 }

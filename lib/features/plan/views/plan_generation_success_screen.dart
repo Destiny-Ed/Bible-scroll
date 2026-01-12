@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/common/services/notification_services.dart';
 import 'package:myapp/features/home/views/home_screen.dart';
 
 class PlanGenerationSuccessScreen extends StatelessWidget {
@@ -59,7 +60,7 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                 const SizedBox(height: 22),
 
                 Text(
-                  'Your Custom Plan is Ready!',
+                  _generatePlanName(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
@@ -161,7 +162,13 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
+                      // After success screen navigation
+                      await DailyNotificationService.initialize();
+                      await DailyNotificationService.scheduleDailyReminder(
+                        const TimeOfDay(hour: 8, minute: 0),
+                      ); // 8:00 AM
+                      //
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -202,6 +209,15 @@ class PlanGenerationSuccessScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _generatePlanName() {
+    if (topics.isEmpty) return 'Personalized Bible Journey';
+    if (topics.contains('Peace') || topics.contains('Comfort')) {
+      return '30 Days of Peace: A Visual Journey';
+    }
+    if (topics.contains('Wisdom')) return 'Wisdom Through the Word';
+    return 'Your $durationDays-Day Spiritual Adventure';
   }
 
   Widget _buildSummaryRow(

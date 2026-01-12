@@ -1,50 +1,154 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/plan/view_model/daily_reading_plan_view.dart';
+import 'package:myapp/features/plan/views/reading_plan_onboarding_screen.dart';
+import 'package:provider/provider.dart';
 
 class DailyReadingPlanScreen extends StatelessWidget {
   const DailyReadingPlanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'My Journey',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+    return Consumer<DailyReadingPlanViewModel>(
+      builder: (context, vm, child) {
+        if (vm.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (vm.error != null) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 80,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(height: 24),
+                  Text(vm.error!, textAlign: TextAlign.center),
+                  const SizedBox(height: 32),
+                  OutlinedButton.icon(
+                    onPressed: vm.refresh,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (vm.hasNoPlan) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.book_rounded, size: 80, color: Colors.grey),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'No reading plan found',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Create your personalized plan to start your journey!',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ReadingPlanOnboardingScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create Plan'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // Success state: Show real plan
+        final planName = vm.planName;
+        final totalDays = vm.totalDays;
+        final completedDays = vm.completedDays;
+        final streak = vm.streak;
+        final progress = vm.getProgress;
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: AppBar(
+            title: const Text(
+              'My Journey',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            children: [
-              _buildPlanOverview(context),
-              const SizedBox(height: 20),
-              _buildTodaysReading(context),
-            ],
+          body: RefreshIndicator(
+            onRefresh: vm.refresh,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildPlanOverview(
+                      context,
+                      planName,
+                      streak,
+                      completedDays,
+                      totalDays,
+                      progress,
+                    ),
+                    const SizedBox(height: 30),
+                    _buildTodaysReading(context, vm.todaysReading),
+                    const SizedBox(height: 30),
+                    _buildMotivationCard(context, streak),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPlanOverview(BuildContext context) {
+  Widget _buildPlanOverview(
+    BuildContext context,
+    String planName,
+    int streak,
+    int completedDays,
+    int totalDays,
+    double progress,
+  ) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -52,54 +156,74 @@ class DailyReadingPlanScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '30-DAY JOURNEY',
+            '$totalDays-DAY JOURNEY',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
+              color: primary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '30 Days of Peace: A Visual Journey',
-            style: TextStyle(
-              fontSize: 22,
+            planName,
+            style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStatColumn('5', 'Days Streak'),
-              _buildStatColumn('12', 'Chapters Read'),
-              _buildStatColumn('40%', 'Completed'),
+              _buildStatColumn(
+                context,
+                '$streak',
+                'Day Streak',
+                Icons.local_fire_department,
+              ),
+              _buildStatColumn(
+                context,
+
+                '$completedDays',
+                'Days Completed',
+                Icons.check_circle,
+              ),
+              _buildStatColumn(
+                context,
+
+                '${(progress * 100).toStringAsFixed(0)}%',
+                'Progress',
+                Icons.percent,
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          LinearProgressIndicator(
-            value: 0.4,
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).colorScheme.primary,
+          const SizedBox(height: 24),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation(primary),
+              minHeight: 12,
             ),
-            minHeight: 10,
-            borderRadius: BorderRadius.circular(5),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatColumn(String value, String label) {
+  Widget _buildStatColumn(
+    BuildContext context,
+    String value,
+    String label,
+    IconData icon,
+  ) {
     return Column(
       children: [
+        Icon(icon, color: Theme.of(context).colorScheme.primary, size: 32),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
@@ -107,22 +231,23 @@ class DailyReadingPlanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodaysReading(BuildContext context) {
+  Widget _buildTodaysReading(
+    BuildContext context,
+    List<Map<String, dynamic>> readings,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Today\'s Reading',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+        Text("Today's Reading", style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 16),
+        ...readings.map(
+          (item) => _buildReadingItem(
+            context,
+            item['title'],
+            item['subtitle'],
+            item['completed'] ?? false,
           ),
         ),
-        const SizedBox(height: 16),
-        _buildReadingItem(context, 'Genesis 1-2', 'The Creation Story', true),
-        _buildReadingItem(context, 'John 1', 'The Word Became Flesh', false),
-        _buildReadingItem(context, 'Psalms 1', 'The Two Ways', false),
       ],
     );
   }
@@ -133,14 +258,14 @@ class DailyReadingPlanScreen extends StatelessWidget {
     String subtitle,
     bool isCompleted,
   ) {
+    final theme = Theme.of(context);
     return Card(
-      margin: const EdgeInsets.only(bottom: 5),
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shadowColor: Colors.black.withAlpha(13),
-      color: isCompleted
-          ? Theme.of(context).colorScheme.primaryContainer
-          : Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: isCompleted
+          ? theme.colorScheme.primaryContainer
+          : theme.colorScheme.surface,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           vertical: 12,
@@ -148,10 +273,8 @@ class DailyReadingPlanScreen extends StatelessWidget {
         ),
         leading: Icon(
           isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: isCompleted
-              ? Theme.of(context).colorScheme.primary
-              : Colors.grey.shade400,
-          size: 28,
+          color: isCompleted ? theme.colorScheme.primary : Colors.grey.shade400,
+          size: 32,
         ),
         title: Text(
           title,
@@ -164,8 +287,51 @@ class DailyReadingPlanScreen extends StatelessWidget {
           color: Colors.grey,
         ),
         onTap: () {
-          // Navigate to chapter detail
+          // Navigate to chapter/video player
         },
+      ),
+    );
+  }
+
+  Widget _buildMotivationCard(BuildContext context, int streak) {
+    final messages = [
+      if (streak == 0) 'Start your streak today!',
+      if (streak == 1) 'Great first day! Keep it going!',
+      if (streak >= 2 && streak < 7) 'You’re on fire! $streak days strong!',
+      if (streak >= 7)
+        'Amazing! $streak-day streak — God is proud of your commitment!',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary.withOpacity(0.15),
+            Theme.of(context).colorScheme.surface,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Keep Going!',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            messages.isNotEmpty
+                ? messages.last
+                : 'Your consistency is making a difference!',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
       ),
     );
   }

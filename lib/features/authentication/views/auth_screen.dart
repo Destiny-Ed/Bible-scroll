@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/features/authentication/viewmodels/auth_viewmodel.dart';
-import 'package:myapp/features/onboarding/views/reading_plan_onboarding_screen.dart';
+import 'package:myapp/features/plan/views/reading_plan_onboarding_screen.dart';
 import 'package:provider/provider.dart';
 
 class AuthScreen extends StatelessWidget {

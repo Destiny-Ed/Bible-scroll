@@ -1,9 +1,11 @@
+import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/features/discover/views/discover_screen.dart';
 import 'package:myapp/features/home/views/feed_screen.dart';
 import 'package:myapp/features/plan/views/daily_reading_plan_screen.dart';
 import 'package:myapp/features/user/views/profile_screen.dart';
 import 'package:myapp/features/library/views/library_screen.dart';
+import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    AdvancedInAppReview()
+        .setMinDaysBeforeRemind(7)
+        .setMinDaysAfterInstall(2)
+        .setMinLaunchTimes(5)
+        .monitor();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // body: PageView(
@@ -41,15 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
       //   },
       //   children: ,
       // ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          FeedScreen(),
-          DiscoverScreen(),
-          DailyReadingPlanScreen(),
-          LibraryScreen(),
-          ProfileScreen(),
-        ],
+      body: UpgradeAlert(
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            FeedScreen(),
+            DiscoverScreen(),
+            DailyReadingPlanScreen(),
+            LibraryScreen(),
+            ProfileScreen(),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
